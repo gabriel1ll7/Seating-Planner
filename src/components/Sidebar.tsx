@@ -1,5 +1,5 @@
 
-import { Guest, Table } from "@/hooks/useSeatingChart";
+import { Guest, Table } from "@/types/seatingChart";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const Sidebar = ({ guests, tables }) => {

@@ -1,7 +1,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { fabric } from "fabric";
-import { Table, Guest } from "@/hooks/useSeatingChart";
+import { Table, Guest } from "@/types/seatingChart";
 import { GuestDialog } from "./GuestDialog";
 import { setupCanvas, createTableOnCanvas, createVenueElementOnCanvas } from "@/utils/canvasUtils";
 
