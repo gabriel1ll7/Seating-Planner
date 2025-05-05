@@ -3,7 +3,6 @@ import { useCallback } from "react";
 import { Canvas } from "fabric";
 import { VenueElement } from "../types/seatingChart";
 import { getRandomPastelColor } from "../utils/venueUtils";
-import { createVenueElementOnCanvas } from "../utils/canvasUtils";
 
 export const useVenueElements = (
   venueElements: VenueElement[],
@@ -20,26 +19,25 @@ export const useVenueElements = (
 
       console.log("Adding venue element to canvas", canvas);
       
+      // Get canvas dimensions for positioning
+      const canvasWidth = canvas.width || 1000;
+      const canvasHeight = canvas.height || 800;
+      
       // Create the new venue element
       const newElement: VenueElement = {
         id: `venue-element-${Date.now()}`,
         title: isMainVenue ? "Main Venue" : "New Element",
-        left: isMainVenue ? 50 : canvas.width! / 2,
-        top: isMainVenue ? 50 : canvas.height! / 2,
-        width: isMainVenue ? canvas.width! - 100 : 150,
-        height: isMainVenue ? canvas.height! - 100 : 100,
+        left: isMainVenue ? 50 : canvasWidth / 2 - 75,
+        top: isMainVenue ? 50 : canvasHeight / 2 - 50,
+        width: isMainVenue ? canvasWidth - 100 : 150,
+        height: isMainVenue ? canvasHeight - 100 : 100,
         color: getRandomPastelColor(),
       };
 
-      // Create element on canvas and get the element with fabric object
-      const elementWithFabricObject = createVenueElementOnCanvas(
-        canvas,
-        newElement,
-        () => {} // Temporary empty handler
-      );
-
-      // Update state with the new venue element
-      setVenueElements(prev => [...prev, elementWithFabricObject]);
+      console.log("Created new venue element:", newElement);
+      
+      // Update state with the new venue element first
+      setVenueElements(prev => [...prev, newElement]);
       
       console.log("Venue element added successfully");
     },

@@ -28,6 +28,7 @@ export const Canvas = ({
   // Initialize canvas
   useEffect(() => {
     if (canvasRef.current && !canvas) {
+      console.log("Initializing canvas");
       const fabricCanvas = setupCanvas(canvasRef.current);
       setCanvas(fabricCanvas);
     }
@@ -41,6 +42,8 @@ export const Canvas = ({
     isButton: boolean,
     buttonType?: string
   ) => {
+    console.log("Table interaction:", table.id, chairIndex, isChair, isButton, buttonType);
+    
     if (isButton) {
       // Handle button clicks (+ or -)
       const change = buttonType === "plus" ? 1 : -1;
@@ -82,6 +85,7 @@ export const Canvas = ({
 
   // Handle venue element update
   const handleVenueElementUpdate = (updatedElement: VenueElement) => {
+    console.log("Venue element update:", updatedElement);
     const updatedElements = venueElements.map((el) => {
       if (el.id === updatedElement.id) {
         return updatedElement;
@@ -180,7 +184,7 @@ export const Canvas = ({
     console.log('Venue elements length:', venueElements.length);
     console.log('Canvas:', canvas);
     
-    // Clear the canvas first
+    // First, clear the canvas
     canvas.clear();
     
     // First, draw venue elements (so they're behind tables)

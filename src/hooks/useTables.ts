@@ -2,7 +2,6 @@
 import { useCallback } from "react";
 import { Canvas } from "fabric";
 import { Table } from "../types/seatingChart";
-import { createTableOnCanvas } from "../utils/canvasUtils";
 
 export const useTables = (
   tables: Table[],
@@ -20,26 +19,24 @@ export const useTables = (
 
     console.log("Adding table to canvas", canvas);
     
+    // Get canvas dimensions for positioning
+    const canvasWidth = canvas.width || 1000;
+    const canvasHeight = canvas.height || 800;
+    
     // Create the new table object
     const newTable: Table = {
       id: `table-${Date.now()}`,
       number: tableCounter,
-      left: canvas.width! / 2,
-      top: canvas.height! / 2,
+      left: canvasWidth / 2,
+      top: canvasHeight / 2,
       radius: 60,
       capacity: 8, // Default capacity
     };
 
-    // Create table on canvas and get the table with fabric object
-    const tableWithFabricObject = createTableOnCanvas(
-      canvas,
-      newTable,
-      [], // Empty guests array for new table
-      () => {} // Temporary empty handler
-    );
-
+    console.log("Created new table:", newTable);
+    
     // Update state with the new table
-    setTables(prev => [...prev, tableWithFabricObject]);
+    setTables(prev => [...prev, newTable]);
     setTableCounter(prev => prev + 1);
     
     console.log("Table added successfully");
