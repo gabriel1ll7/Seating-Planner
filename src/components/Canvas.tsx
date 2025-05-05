@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from "react";
 import { fabric } from "fabric";
 import { Table, Guest } from "@/hooks/useSeatingChart";
@@ -468,20 +467,27 @@ export const Canvas = ({
 
   // Render tables whenever tables state changes
   useEffect(() => {
-    if (canvas && tables.length > 0) {
-      tables.forEach((table) => {
+    if (!canvas || tables.length === 0) return;
+    
+    // Create a separate function to avoid setting state in the effect
+    const updateTablesOnCanvas = () => {
+      const updatedTables = [...tables];
+      tables.forEach((table, index) => {
         const updatedTable = updateTableOnCanvas(table);
         if (updatedTable) {
-          // Update the table in state with the fabric object
-          setTables((prevTables) =>
-            prevTables.map((t) =>
-              t.id === updatedTable.id ? updatedTable : t
-            )
-          );
+          updatedTables[index] = updatedTable;
         }
       });
+      return updatedTables;
+    };
+    
+    const newTables = updateTablesOnCanvas();
+    
+    // Only set tables state if it actually changed
+    if (JSON.stringify(newTables) !== JSON.stringify(tables)) {
+      setTables(newTables);
     }
-  }, [canvas, tables, guests]);
+  }, [canvas, tables.length, guests.length]); // Only depend on the lengths to avoid infinite renders
 
   return (
     <div className="relative w-full h-full overflow-hidden">
