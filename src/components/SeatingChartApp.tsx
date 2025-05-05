@@ -14,6 +14,8 @@ export const SeatingChartApp = () => {
     setCanvas,
     tables,
     setTables,
+    venueElements,
+    setVenueElements,
     guests,
     setGuests,
     totalGuests,
@@ -31,10 +33,10 @@ export const SeatingChartApp = () => {
 
   // Save to localStorage whenever state changes
   useEffect(() => {
-    if (canvas && tables.length > 0) {
+    if (canvas && (tables.length > 0 || venueElements.length > 0)) {
       saveToLocalStorage();
     }
-  }, [canvas, tables, guests, saveToLocalStorage]);
+  }, [canvas, tables, venueElements, guests, saveToLocalStorage]);
 
   const handleReset = () => {
     if (window.confirm("Are you sure you want to clear the entire canvas and start fresh?")) {
@@ -78,7 +80,9 @@ export const SeatingChartApp = () => {
             canvas={canvas}
             setCanvas={setCanvas}
             tables={tables}
+            venueElements={venueElements}
             setTables={setTables}
+            setVenueElements={setVenueElements}
             guests={guests}
             setGuests={setGuests}
           />

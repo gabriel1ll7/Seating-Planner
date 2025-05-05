@@ -1,7 +1,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { fabric } from "fabric";
-import { Table, Guest } from "@/types/seatingChart";
+import { Table, Guest, VenueElement } from "@/types/seatingChart";
 import { GuestDialog } from "./GuestDialog";
 import { setupCanvas, createTableOnCanvas, createVenueElementOnCanvas } from "@/utils/canvasUtils";
 
@@ -9,7 +9,9 @@ export const Canvas = ({
   canvas,
   setCanvas,
   tables,
+  venueElements,
   setTables,
+  setVenueElements,
   guests,
   setGuests,
 }) => {
@@ -79,14 +81,14 @@ export const Canvas = ({
   };
 
   // Handle venue element update
-  const handleVenueElementUpdate = (updatedElement) => {
-    const updatedElements = tables.map((el) => {
+  const handleVenueElementUpdate = (updatedElement: VenueElement) => {
+    const updatedElements = venueElements.map((el) => {
       if (el.id === updatedElement.id) {
         return updatedElement;
       }
       return el;
     });
-    setTables(updatedElements);
+    setVenueElements(updatedElements);
   };
 
   // Handle adding/removing chairs when capacity changes
@@ -175,14 +177,13 @@ export const Canvas = ({
     
     // Debug information
     console.log('Tables length:', tables.length);
-    console.log('Tables:', tables);
+    console.log('Venue elements length:', venueElements.length);
     console.log('Canvas:', canvas);
     
     // Clear the canvas first
     canvas.clear();
     
     // First, draw venue elements (so they're behind tables)
-    const venueElements = tables.filter(el => el.title !== undefined);
     venueElements.forEach(element => {
       createVenueElementOnCanvas(
         canvas, 
@@ -192,8 +193,7 @@ export const Canvas = ({
     });
     
     // Then draw tables
-    const tableElements = tables.filter(el => el.title === undefined);
-    tableElements.forEach(table => {
+    tables.forEach(table => {
       createTableOnCanvas(
         canvas, 
         table, 
@@ -205,7 +205,7 @@ export const Canvas = ({
     // Make sure to render after all objects are added
     canvas.renderAll();
     
-  }, [canvas, tables, guests]);
+  }, [canvas, tables, venueElements, guests]);
 
   return (
     <div className="relative w-full h-full overflow-hidden border border-gray-200 rounded-lg">

@@ -19,9 +19,6 @@ export const useSeatingChart = () => {
   // Calculate total guests
   const totalGuests = guests.length;
 
-  // Combined tables and venue elements for rendering
-  const combinedElements = [...tables, ...venueElements];
-
   // Set up venue elements management
   const { addVenueElement } = useVenueElements(
     venueElements,
@@ -44,7 +41,8 @@ export const useSeatingChart = () => {
   // Set up localStorage management
   const { saveToLocalStorage, loadFromLocalStorage, resetCanvas } = useLocalStorage(
     canvas,
-    combinedElements,
+    tables,
+    venueElements,
     guests,
     tableCounter,
     addVenueElement
@@ -131,7 +129,7 @@ export const useSeatingChart = () => {
   return {
     canvas,
     setCanvas,
-    tables: combinedElements, // Pass combined elements as tables
+    tables,
     setTables,
     venueElements,
     setVenueElements,

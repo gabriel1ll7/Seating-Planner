@@ -1,11 +1,12 @@
 
 import { useCallback } from "react";
 import { Canvas } from "fabric";
-import { Guest, Table } from "../types/seatingChart";
+import { Guest, Table, VenueElement } from "../types/seatingChart";
 
 export const useLocalStorage = (
   canvas: Canvas | null,
   tables: Table[],
+  venueElements: VenueElement[],
   guests: Guest[],
   tableCounter: number,
   addVenueElement: (isMainVenue?: boolean) => void
@@ -45,7 +46,7 @@ export const useLocalStorage = (
           
           // Reconnect fabric objects with our state objects
           const loadedTables: Table[] = [];
-          const loadedVenueElements: any[] = [];
+          const loadedVenueElements: VenueElement[] = [];
           
           canvas.getObjects().forEach(obj => {
             if (obj.type === 'circle' && obj.tableId) {
