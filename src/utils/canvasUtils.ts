@@ -4,8 +4,8 @@ import { Table, Guest, VenueElement } from "@/types/seatingChart";
 
 export const setupCanvas = (canvasElement: HTMLCanvasElement): fabric.Canvas => {
   const fabricCanvas = new fabric.Canvas(canvasElement, {
-    width: 1000,
-    height: 800,
+    width: window.innerWidth - 350, // Adjust width to account for sidebar
+    height: window.innerHeight - 150, // Adjust height to account for header
     backgroundColor: "#f5f7fb",
     selection: true,
     preserveObjectStacking: true,
@@ -60,25 +60,26 @@ export const createTableOnCanvas = (
   guests: Guest[], 
   onTableClick: (table: Table, chairIndex: number, isChair: boolean, isButton: boolean, buttonType?: string) => void
 ): void => {
-  // Create the table circle
+  // Create the table circle - make it more visible with stronger colors
   const circle = new fabric.Circle({
     left: table.left,
     top: table.top,
     fill: "#ffffff",
     stroke: "#2563eb",
-    strokeWidth: 2,
+    strokeWidth: 3,
     radius: table.radius,
     originX: 'center',
     originY: 'center',
     hasControls: true,
     hasBorders: true,
     lockRotation: true,
-    data: {
-      tableId: table.id,
-      type: "table"
-    },
+    objectCaching: false,
     selectable: true,
   });
+
+  // Set custom properties for identification
+  circle.set('tableId', table.id);
+  circle.set('type', "table");
 
   // Add the circle to canvas
   canvas.add(circle);
@@ -93,11 +94,12 @@ export const createTableOnCanvas = (
     originX: 'center',
     originY: 'center',
     selectable: false,
-    data: {
-      tableId: table.id,
-      type: "tableText"
-    }
+    objectCaching: false,
   });
+
+  // Set custom properties for identification
+  tableNumberText.set('tableId', table.id);
+  tableNumberText.set('type', "tableText");
 
   // Add the text to canvas
   canvas.add(tableNumberText);
@@ -114,12 +116,13 @@ export const createTableOnCanvas = (
       originX: 'center',
       originY: 'center',
       selectable: false,
-      data: {
-        tableId: table.id,
-        type: "tableGuestCount"
-      }
+      objectCaching: false,
     }
   );
+
+  // Set custom properties for identification
+  guestCountText.set('tableId', table.id);
+  guestCountText.set('type', "tableGuestCount");
 
   // Add the guest count to canvas
   canvas.add(guestCountText);
@@ -137,12 +140,13 @@ export const createTableOnCanvas = (
     width: 20,
     height: 20,
     selectable: true,
-    data: {
-      tableId: table.id,
-      type: "tableButton",
-      buttonType: "plus"
-    }
+    objectCaching: false,
   });
+  
+  // Set custom properties for identification
+  plusButton.set('tableId', table.id);
+  plusButton.set('type', "tableButton");
+  plusButton.set('buttonType', "plus");
   
   const minusButton = new fabric.Text("-", {
     left: table.left - table.radius - 10,
@@ -156,12 +160,13 @@ export const createTableOnCanvas = (
     width: 20,
     height: 20,
     selectable: true,
-    data: {
-      tableId: table.id,
-      type: "tableButton",
-      buttonType: "minus"
-    }
+    objectCaching: false,
   });
+  
+  // Set custom properties for identification
+  minusButton.set('tableId', table.id);
+  minusButton.set('type', "tableButton");
+  minusButton.set('buttonType', "minus");
   
   // Add capacity buttons to canvas
   canvas.add(plusButton);
@@ -198,15 +203,16 @@ export const createTableOnCanvas = (
       radius: chairRadius,
       originX: 'center',
       originY: 'center',
-      data: {
-        chairIndex: i,
-        tableId: table.id,
-        type: "tableChair"
-      },
       hasControls: false,
       hasBorders: false,
       selectable: true,
+      objectCaching: false,
     });
+    
+    // Set custom properties for identification
+    chair.set('chairIndex', i);
+    chair.set('tableId', table.id);
+    chair.set('type', "tableChair");
     
     // Add chair to canvas
     canvas.add(chair);
@@ -224,19 +230,19 @@ export const createTableOnCanvas = (
     
     // Update all the elements associated with this table
     canvas.getObjects().forEach(obj => {
-      if (obj.data?.tableId === table.id && obj !== circle) {
-        if (obj.data?.type === "tableText") {
+      if (obj.tableId === table.id && obj !== circle) {
+        if (obj.type === "tableText") {
           obj.set({
             left: newLeft,
             top: newTop - 10
           });
-        } else if (obj.data?.type === "tableGuestCount") {
+        } else if (obj.type === "tableGuestCount") {
           obj.set({
             left: newLeft,
             top: newTop + 10
           });
-        } else if (obj.data?.type === "tableChair") {
-          const chairIndex = obj.data?.chairIndex;
+        } else if (obj.type === "tableChair") {
+          const chairIndex = obj.chairIndex;
           if (typeof chairIndex === 'number') {
             const angle = (chairIndex * 2 * Math.PI) / table.capacity;
             obj.set({
@@ -244,13 +250,13 @@ export const createTableOnCanvas = (
               top: newTop + (table.radius + 20) * Math.sin(angle)
             });
           }
-        } else if (obj.data?.type === "tableButton") {
-          if (obj.data?.buttonType === "plus") {
+        } else if (obj.type === "tableButton") {
+          if (obj.buttonType === "plus") {
             obj.set({
               left: newLeft + table.radius + 10,
               top: newTop
             });
-          } else if (obj.data?.buttonType === "minus") {
+          } else if (obj.buttonType === "minus") {
             obj.set({
               left: newLeft - table.radius - 10,
               top: newTop
@@ -262,6 +268,9 @@ export const createTableOnCanvas = (
     
     // Call the handler to update the table position in state
     onTableClick({...table, left: newLeft, top: newTop}, -1, false, false);
+    
+    // Ensure canvas is re-rendered after move
+    canvas.renderAll();
   });
 
   // Make sure to render after all objects are added
@@ -281,20 +290,21 @@ export const createVenueElementOnCanvas = (
     height: element.height,
     fill: element.color || "#E5DEFF",
     stroke: "#6b7280",
-    strokeWidth: 1,
+    strokeWidth: 2,
     rx: 5,
     ry: 5,
     originX: 'left',
     originY: 'top',
-    data: {
-      id: element.id,
-      type: "venueElement"
-    },
-    opacity: 0.7, // Make it semi-transparent
+    opacity: 0.8, // Increased from 0.7 for better visibility
     hasControls: true,
     hasBorders: true,
     selectable: true,
+    objectCaching: false,
   });
+
+  // Set custom properties for identification
+  rect.set('id', element.id);
+  rect.set('type', "venueElement");
 
   // Add rectangle to canvas
   canvas.add(rect);
@@ -303,17 +313,18 @@ export const createVenueElementOnCanvas = (
   const titleText = new fabric.Text(element.title, {
     left: element.left + element.width / 2,
     top: element.top + element.height / 2,
-    fontSize: 16,
+    fontSize: 18, // Increased from 16 for better visibility
     fontWeight: "bold",
     fill: "#1f2937",
     originX: 'center',
     originY: 'center',
     selectable: false,
-    data: {
-      parentId: element.id,
-      type: "venueTitle"
-    }
+    objectCaching: false,
   });
+
+  // Set custom properties for identification
+  titleText.set('parentId', element.id);
+  titleText.set('type', "venueTitle");
 
   // Add title to canvas
   canvas.add(titleText);
@@ -325,7 +336,7 @@ export const createVenueElementOnCanvas = (
     
     // Update the title text position
     canvas.getObjects().forEach(obj => {
-      if (obj.data?.type === "venueTitle" && obj.data?.parentId === element.id) {
+      if (obj.type === "venueTitle" && obj.parentId === element.id) {
         obj.set({
           left: newLeft + (rect.width || 0) * (rect.scaleX || 1) / 2,
           top: newTop + (rect.height || 0) * (rect.scaleY || 1) / 2
@@ -339,6 +350,9 @@ export const createVenueElementOnCanvas = (
       left: newLeft, 
       top: newTop
     });
+    
+    // Ensure canvas is re-rendered after move
+    canvas.renderAll();
   });
 
   // Handle scaling the element
@@ -354,7 +368,7 @@ export const createVenueElementOnCanvas = (
     
     // Update the title text position
     canvas.getObjects().forEach(obj => {
-      if (obj.data?.type === "venueTitle" && obj.data?.parentId === element.id) {
+      if (obj.type === "venueTitle" && obj.parentId === element.id) {
         obj.set({
           left: newLeft + newWidth / 2,
           top: newTop + newHeight / 2
@@ -368,6 +382,9 @@ export const createVenueElementOnCanvas = (
       width: newWidth, 
       height: newHeight
     });
+    
+    // Ensure canvas is re-rendered after scaling
+    canvas.renderAll();
   });
 
   // Make sure to render after all objects are added

@@ -25,8 +25,6 @@ export const Canvas = ({
   const [guestFirstName, setGuestFirstName] = useState("");
   const [guestLastName, setGuestLastName] = useState("");
   const [isCanvasInitialized, setIsCanvasInitialized] = useState(false);
-  const [renderedTablesCount, setRenderedTablesCount] = useState(0);
-  const [renderedElementsCount, setRenderedElementsCount] = useState(0);
 
   // Initialize canvas
   useEffect(() => {
@@ -36,6 +34,18 @@ export const Canvas = ({
       setCanvas(fabricCanvas);
       setIsCanvasInitialized(true);
     }
+    
+    // Resize handler for responsive canvas
+    const handleResize = () => {
+      if (canvas) {
+        canvas.setWidth(window.innerWidth - 350);
+        canvas.setHeight(window.innerHeight - 150);
+        canvas.renderAll();
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [setCanvas, canvas]);
 
   // Handle table interactions (chair clicks, button clicks, or moving)
@@ -176,18 +186,14 @@ export const Canvas = ({
     setGuestLastName("");
   };
 
-  // Render elements whenever data changes but prevent re-rendering the same elements
+  // Render elements whenever data changes
   useEffect(() => {
     if (!canvas || !isCanvasInitialized) return;
     
-    // Only perform a full re-render if the counts have changed
-    if (tables.length === renderedTablesCount && venueElements.length === renderedElementsCount) {
-      return;
-    }
-    
-    // Clear the existing objects (important - prevents duplicate rendering)
+    // Clear the existing objects
     canvas.clear();
-    
+    canvas.backgroundColor = "#f5f7fb";
+
     // First, draw venue elements (so they're behind tables)
     venueElements.forEach(element => {
       createVenueElementOnCanvas(
@@ -210,14 +216,10 @@ export const Canvas = ({
     // Make sure to render all changes
     canvas.renderAll();
     
-    // Update the counters to prevent unnecessary re-renders
-    setRenderedTablesCount(tables.length);
-    setRenderedElementsCount(venueElements.length);
-    
-  }, [canvas, tables, venueElements, guests, isCanvasInitialized, renderedTablesCount, renderedElementsCount]);
+  }, [canvas, tables, venueElements, guests, isCanvasInitialized]);
 
   return (
-    <div className="relative w-full h-full overflow-hidden border border-gray-200 rounded-lg">
+    <div className="relative w-full h-full overflow-hidden border border-gray-200 rounded-lg bg-gray-50">
       <canvas ref={canvasRef} className="fabric-canvas" />
       
       <GuestDialog

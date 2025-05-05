@@ -39,12 +39,11 @@ export const useTables = (
       capacity: 8, // Default capacity
     };
     
-    console.log("Created new table:", newTable);
-    
     // Update state with the new table
     setTables(prev => [...prev, newTable]);
     setTableCounter(prev => prev + 1);
     
+    console.log("Created new table:", newTable);
     console.log("Table added successfully");
   }, [canvas, tableCounter, setTables, setTableCounter]);
 

@@ -40,11 +40,10 @@ export const useVenueElements = (
         color: getRandomPastelColor(),
       };
       
-      console.log("Created new venue element:", newElement);
-      
       // Update state with the new venue element
       setVenueElements(prev => [...prev, newElement]);
       
+      console.log("Created new venue element:", newElement);
       console.log("Venue element added successfully");
     },
     [canvas, setVenueElements]
