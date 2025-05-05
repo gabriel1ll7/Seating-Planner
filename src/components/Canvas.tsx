@@ -167,51 +167,37 @@ export const Canvas = ({
     setActiveChair(null);
     setGuestFirstName("");
     setGuestLastName("");
-    
-    // Canvas will be updated in the effect below
   };
 
   // Render tables whenever tables state changes
   useEffect(() => {
     if (!canvas || tables.length === 0) return;
     
+    canvas.clear(); // Clear the canvas first to avoid duplicates
+    
     // Create a separate function to avoid setting state in the effect
-    const updateTablesOnCanvas = () => {
-      const updatedTables = [...tables];
-      tables.forEach((table, index) => {
-        if (table.title) {
-          // This is a venue element
-          const updatedElement = createVenueElementOnCanvas(
-            canvas, 
-            table, 
-            handleVenueElementUpdate
-          );
-          if (updatedElement) {
-            updatedTables[index] = updatedElement;
-          }
-        } else {
-          // This is a table
-          const updatedTable = createTableOnCanvas(
-            canvas, 
-            table, 
-            guests,
-            handleTableInteraction
-          );
-          if (updatedTable) {
-            updatedTables[index] = updatedTable;
-          }
-        }
-      });
-      return updatedTables;
-    };
+    tables.forEach((table) => {
+      if (table.title) {
+        // This is a venue element
+        createVenueElementOnCanvas(
+          canvas, 
+          table, 
+          handleVenueElementUpdate
+        );
+      } else {
+        // This is a table
+        createTableOnCanvas(
+          canvas, 
+          table, 
+          guests,
+          handleTableInteraction
+        );
+      }
+    });
     
-    const newTables = updateTablesOnCanvas();
+    canvas.renderAll(); // Make sure to render after all objects are added
     
-    // Only set tables state if it actually changed
-    if (JSON.stringify(newTables) !== JSON.stringify(tables)) {
-      setTables(newTables);
-    }
-  }, [canvas, tables.length, guests.length]); // Only depend on the lengths to avoid infinite renders
+  }, [canvas, tables, guests]);
 
   return (
     <div className="relative w-full h-full overflow-hidden">

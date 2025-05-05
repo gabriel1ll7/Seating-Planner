@@ -2,6 +2,7 @@
 import { useCallback } from "react";
 import { Canvas } from "fabric";
 import { Table } from "../types/seatingChart";
+import { createTableOnCanvas } from "../utils/canvasUtils";
 
 export const useTables = (
   tables: Table[],
@@ -23,7 +24,16 @@ export const useTables = (
       capacity: 8, // Default capacity
     };
 
-    setTables((prev) => [...prev, newTable]);
+    // Create table on canvas first
+    const tableWithFabricObject = createTableOnCanvas(
+      canvas,
+      newTable,
+      [],
+      () => {} // Temporary empty handler
+    );
+
+    // Then add to state
+    setTables((prev) => [...prev, tableWithFabricObject]);
     setTableCounter((prev) => prev + 1);
   }, [canvas, tableCounter, setTables, setTableCounter]);
 

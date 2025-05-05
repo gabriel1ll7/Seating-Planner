@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { Canvas } from "fabric";
 import { VenueElement } from "../types/seatingChart";
 import { getRandomPastelColor } from "../utils/venueUtils";
+import { createVenueElementOnCanvas } from "../utils/canvasUtils";
 
 export const useVenueElements = (
   venueElements: VenueElement[],
@@ -24,7 +25,15 @@ export const useVenueElements = (
         color: getRandomPastelColor(),
       };
 
-      setVenueElements((prev) => [...prev, newElement]);
+      // Create element on canvas first
+      const elementWithFabricObject = createVenueElementOnCanvas(
+        canvas,
+        newElement,
+        () => {} // Temporary empty handler
+      );
+
+      // Then add to state
+      setVenueElements((prev) => [...prev, elementWithFabricObject]);
     },
     [canvas, setVenueElements]
   );
