@@ -60,18 +60,6 @@ export const createTableOnCanvas = (
   guests: Guest[], 
   onTableClick: (table: Table, chairIndex: number, isChair: boolean, isButton: boolean, buttonType?: string) => void
 ): void => {
-  console.log("Creating table on canvas:", table);
-
-  // First clean up any previous objects with this table ID
-  const objectsToRemove = canvas.getObjects().filter(obj => 
-    obj.data?.tableId === table.id || 
-    obj.data?.type === "tableText" || 
-    obj.data?.type === "tableGuestCount" ||
-    obj.data?.type === "tableChair"
-  );
-  
-  objectsToRemove.forEach(obj => canvas.remove(obj));
-
   // Create the table circle
   const circle = new fabric.Circle({
     left: table.left,
@@ -94,7 +82,6 @@ export const createTableOnCanvas = (
 
   // Add the circle to canvas
   canvas.add(circle);
-  console.log("Added circle to canvas:", canvas);
 
   // Create table number text
   const tableNumberText = new fabric.Text(`Table ${table.number}`, {
@@ -226,7 +213,6 @@ export const createTableOnCanvas = (
     
     // Handle chair clicks to assign guests
     chair.on('mousedown', () => {
-      console.log("Chair clicked:", i);
       onTableClick(table, i, true, false);
     });
   }
@@ -287,17 +273,7 @@ export const createVenueElementOnCanvas = (
   element: VenueElement,
   onElementUpdate: (updatedElement: VenueElement) => void
 ): void => {
-  console.log("Creating venue element on canvas:", element);
-  
-  // Clean up any previous objects with this venue element ID
-  const objectsToRemove = canvas.getObjects().filter(obj => 
-    obj.data?.id === element.id || 
-    obj.data?.type === "venueTitle" && obj.data?.parentId === element.id
-  );
-  
-  objectsToRemove.forEach(obj => canvas.remove(obj));
-
-  // Create the rectangle
+  // Create the rectangle with solid fill for better visibility
   const rect = new fabric.Rect({
     left: element.left,
     top: element.top,
@@ -314,6 +290,7 @@ export const createVenueElementOnCanvas = (
       id: element.id,
       type: "venueElement"
     },
+    opacity: 0.7, // Make it semi-transparent
     hasControls: true,
     hasBorders: true,
     selectable: true,
@@ -321,7 +298,6 @@ export const createVenueElementOnCanvas = (
 
   // Add rectangle to canvas
   canvas.add(rect);
-  console.log("Added rectangle to canvas:", canvas);
 
   // Create title text
   const titleText = new fabric.Text(element.title, {

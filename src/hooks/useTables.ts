@@ -16,8 +16,6 @@ export const useTables = (
       console.error("Cannot add table: Canvas is null");
       return;
     }
-
-    console.log("Adding table to canvas", canvas);
     
     // Get canvas dimensions for positioning
     const canvasWidth = canvas.width || 1000;
@@ -40,7 +38,7 @@ export const useTables = (
       radius: 60,
       capacity: 8, // Default capacity
     };
-
+    
     console.log("Created new table:", newTable);
     
     // Update state with the new table

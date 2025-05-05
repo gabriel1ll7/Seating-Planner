@@ -16,8 +16,6 @@ export const useVenueElements = (
         console.error("Cannot add venue element: Canvas is null");
         return;
       }
-
-      console.log("Adding venue element to canvas", canvas);
       
       // Get canvas dimensions for positioning
       const canvasWidth = canvas.width || 1000;
@@ -35,13 +33,13 @@ export const useVenueElements = (
       const newElement: VenueElement = {
         id: `venue-element-${Date.now()}`,
         title: isMainVenue ? "Main Venue" : "New Element",
-        left: isMainVenue ? 100 : visibleCenterX - 150,
-        top: isMainVenue ? 100 : visibleCenterY - 100,
-        width: isMainVenue ? canvasWidth - 200 : 300,
-        height: isMainVenue ? canvasHeight - 200 : 200,
+        left: isMainVenue ? visibleCenterX - 400 : visibleCenterX - 150,
+        top: isMainVenue ? visibleCenterY - 300 : visibleCenterY - 100,
+        width: isMainVenue ? 800 : 300,
+        height: isMainVenue ? 600 : 200,
         color: getRandomPastelColor(),
       };
-
+      
       console.log("Created new venue element:", newElement);
       
       // Update state with the new venue element

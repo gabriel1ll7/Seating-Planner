@@ -25,6 +25,8 @@ export const Canvas = ({
   const [guestFirstName, setGuestFirstName] = useState("");
   const [guestLastName, setGuestLastName] = useState("");
   const [isCanvasInitialized, setIsCanvasInitialized] = useState(false);
+  const [renderedTablesCount, setRenderedTablesCount] = useState(0);
+  const [renderedElementsCount, setRenderedElementsCount] = useState(0);
 
   // Initialize canvas
   useEffect(() => {
@@ -44,8 +46,6 @@ export const Canvas = ({
     isButton: boolean,
     buttonType?: string
   ) => {
-    console.log("Table interaction:", table.id, chairIndex, isChair, isButton, buttonType);
-    
     if (isButton) {
       // Handle button clicks (+ or -)
       const change = buttonType === "plus" ? 1 : -1;
@@ -87,7 +87,6 @@ export const Canvas = ({
 
   // Handle venue element update
   const handleVenueElementUpdate = (updatedElement: VenueElement) => {
-    console.log("Venue element update:", updatedElement);
     const updatedElements = venueElements.map((el) => {
       if (el.id === updatedElement.id) {
         return updatedElement;
@@ -177,14 +176,14 @@ export const Canvas = ({
     setGuestLastName("");
   };
 
-  // Render elements whenever data changes
+  // Render elements whenever data changes but prevent re-rendering the same elements
   useEffect(() => {
     if (!canvas || !isCanvasInitialized) return;
     
-    // Debug information
-    console.log('Tables length:', tables.length);
-    console.log('Venue elements length:', venueElements.length);
-    console.log('Canvas:', canvas);
+    // Only perform a full re-render if the counts have changed
+    if (tables.length === renderedTablesCount && venueElements.length === renderedElementsCount) {
+      return;
+    }
     
     // Clear the existing objects (important - prevents duplicate rendering)
     canvas.clear();
@@ -211,7 +210,11 @@ export const Canvas = ({
     // Make sure to render all changes
     canvas.renderAll();
     
-  }, [canvas, tables, venueElements, guests, isCanvasInitialized]);
+    // Update the counters to prevent unnecessary re-renders
+    setRenderedTablesCount(tables.length);
+    setRenderedElementsCount(venueElements.length);
+    
+  }, [canvas, tables, venueElements, guests, isCanvasInitialized, renderedTablesCount, renderedElementsCount]);
 
   return (
     <div className="relative w-full h-full overflow-hidden border border-gray-200 rounded-lg">
