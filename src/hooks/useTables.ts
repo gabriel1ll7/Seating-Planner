@@ -23,7 +23,7 @@ export const useTables = (
     const canvasWidth = canvas.width || 1000;
     const canvasHeight = canvas.height || 800;
     
-    // Create the new table object
+    // Create the new table object - position in the center of the visible area
     const newTable: Table = {
       id: `table-${Date.now()}`,
       number: tableCounter,

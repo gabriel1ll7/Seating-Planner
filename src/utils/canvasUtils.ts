@@ -62,12 +62,15 @@ export const createTableOnCanvas = (
 ): Table => {
   console.log("Creating table on canvas:", table);
 
-  // Remove old table object if it exists
-  if (table.fabricObject) {
-    canvas.remove(table.fabricObject);
-  }
+  // First clean up any previous objects with this table ID
+  const objectsToRemove = canvas.getObjects().filter(obj => 
+    (obj as any).tableId === table.id || 
+    ((obj as any).id === `text-${table.id}` || (obj as any).id === `guest-count-${table.id}`)
+  );
+  
+  objectsToRemove.forEach(obj => canvas.remove(obj));
 
-  // Create the table circle without grouping first
+  // Create the table circle
   const circle = new fabric.Circle({
     left: table.left,
     top: table.top,
@@ -84,25 +87,18 @@ export const createTableOnCanvas = (
     selectable: true,
   });
 
-  // Add the table circle to the canvas directly first
-  canvas.add(circle);
-  canvas.renderAll();
-  console.log("Added circle to canvas:", circle);
-
   // Create table number text
   const tableNumberText = new fabric.Text(`Table ${table.number}`, {
     left: table.left,
-    top: table.top - table.radius - 10,
-    fontSize: 18,
+    top: table.top - 10,
+    fontSize: 16,
     fontWeight: "bold",
     fill: "#1e3a8a",
     originX: 'center',
     originY: 'center',
     selectable: false,
+    id: `text-${table.id}`,
   });
-
-  // Add text to canvas
-  canvas.add(tableNumberText);
 
   // Create guest count text
   const tableGuestCount = guests.filter((g) => g.tableId === table.id).length;
@@ -110,19 +106,18 @@ export const createTableOnCanvas = (
     `${tableGuestCount}/${table.capacity} guests`, 
     {
       left: table.left,
-      top: table.top + table.radius + 10,
+      top: table.top + 10,
       fontSize: 14,
       fill: "#4b5563",
       originX: 'center',
       originY: 'center',
       selectable: false,
+      id: `guest-count-${table.id}`,
     }
   );
 
-  // Add guest count to canvas
-  canvas.add(guestCountText);
-
   // Create chair circles
+  const chairs = [];
   for (let i = 0; i < table.capacity; i++) {
     const angle = (i * 2 * Math.PI) / table.capacity;
     const chairRadius = 12;
@@ -157,9 +152,14 @@ export const createTableOnCanvas = (
       onTableClick(table, i, true, false);
     });
 
-    // Add chair to canvas
-    canvas.add(chair);
+    chairs.push(chair);
   }
+
+  // Add everything to canvas
+  canvas.add(circle);
+  canvas.add(tableNumberText);
+  canvas.add(guestCountText);
+  chairs.forEach(chair => canvas.add(chair));
 
   // Handle moving the table - update position of all components
   circle.on("moving", (e) => {
@@ -174,24 +174,21 @@ export const createTableOnCanvas = (
       // Update table text positions
       tableNumberText.set({
         left: newLeft,
-        top: newTop - table.radius - 10
+        top: newTop - 10
       });
       
       guestCountText.set({
         left: newLeft,
-        top: newTop + table.radius + 10
+        top: newTop + 10
       });
       
       // Update chair positions
-      canvas.getObjects().forEach(obj => {
-        if (obj.chairIndex !== undefined && obj.tableId === table.id) {
-          const chairIndex = obj.chairIndex;
-          const angle = (chairIndex * 2 * Math.PI) / table.capacity;
-          obj.set({
-            left: newLeft + (table.radius + 20) * Math.cos(angle),
-            top: newTop + (table.radius + 20) * Math.sin(angle)
-          });
-        }
+      chairs.forEach((chair, i) => {
+        const angle = (i * 2 * Math.PI) / table.capacity;
+        chair.set({
+          left: newLeft + (table.radius + 20) * Math.cos(angle),
+          top: newTop + (table.radius + 20) * Math.sin(angle)
+        });
       });
       
       canvas.renderAll();
@@ -218,10 +215,12 @@ export const createVenueElementOnCanvas = (
 ): VenueElement => {
   console.log("Creating venue element on canvas:", element);
   
-  // Remove old element if it exists
-  if (element.fabricObject) {
-    canvas.remove(element.fabricObject);
-  }
+  // Clean up any previous objects with this venue element ID
+  const objectsToRemove = canvas.getObjects().filter(obj => 
+    (obj as any).id === element.id || (obj as any).id === `title-${element.id}`
+  );
+  
+  objectsToRemove.forEach(obj => canvas.remove(obj));
 
   // Create the rectangle
   const rect = new fabric.Rect({
@@ -229,7 +228,7 @@ export const createVenueElementOnCanvas = (
     top: element.top,
     width: element.width,
     height: element.height,
-    fill: element.color,
+    fill: element.color || "#E5DEFF",
     stroke: "#6b7280",
     strokeWidth: 1,
     rx: 5,
@@ -241,11 +240,6 @@ export const createVenueElementOnCanvas = (
     selectable: true,
   });
 
-  // Add rectangle to canvas
-  canvas.add(rect);
-  canvas.renderAll();
-  console.log("Added rectangle to canvas:", rect);
-
   // Create title text
   const titleText = new fabric.Text(element.title, {
     left: element.left + element.width / 2,
@@ -256,9 +250,11 @@ export const createVenueElementOnCanvas = (
     originX: 'center',
     originY: 'center',
     selectable: false,
+    id: `title-${element.id}`,
   });
 
-  // Add text to canvas
+  // Add objects to canvas
+  canvas.add(rect);
   canvas.add(titleText);
 
   // Handle moving the element
@@ -287,8 +283,12 @@ export const createVenueElementOnCanvas = (
   // Handle scaling the element
   rect.on("scaling", (e) => {
     const target = e.target;
-    const newWidth = target.width * target.scaleX;
-    const newHeight = target.height * target.scaleY;
+    const scaleX = target.scaleX || 1;
+    const scaleY = target.scaleY || 1;
+    const width = target.width || 0;
+    const height = target.height || 0;
+    const newWidth = width * scaleX;
+    const newHeight = height * scaleY;
     
     // Update element data
     element.width = newWidth;

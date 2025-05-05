@@ -184,7 +184,7 @@ export const Canvas = ({
     console.log('Venue elements length:', venueElements.length);
     console.log('Canvas:', canvas);
     
-    // First, clear the canvas
+    // Clear the existing objects
     canvas.clear();
     
     // First, draw venue elements (so they're behind tables)
@@ -205,9 +205,6 @@ export const Canvas = ({
         handleTableInteraction
       );
     });
-    
-    // Make sure to render after all objects are added
-    canvas.renderAll();
     
   }, [canvas, tables, venueElements, guests]);
 

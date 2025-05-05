@@ -27,16 +27,16 @@ export const useVenueElements = (
       const newElement: VenueElement = {
         id: `venue-element-${Date.now()}`,
         title: isMainVenue ? "Main Venue" : "New Element",
-        left: isMainVenue ? 50 : canvasWidth / 2 - 75,
-        top: isMainVenue ? 50 : canvasHeight / 2 - 50,
-        width: isMainVenue ? canvasWidth - 100 : 150,
-        height: isMainVenue ? canvasHeight - 100 : 100,
+        left: isMainVenue ? 100 : canvasWidth / 2 - 150,
+        top: isMainVenue ? 100 : canvasHeight / 2 - 100,
+        width: isMainVenue ? canvasWidth - 200 : 300,
+        height: isMainVenue ? canvasHeight - 200 : 200,
         color: getRandomPastelColor(),
       };
 
       console.log("Created new venue element:", newElement);
       
-      // Update state with the new venue element first
+      // Update state with the new venue element
       setVenueElements(prev => [...prev, newElement]);
       
       console.log("Venue element added successfully");
