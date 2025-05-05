@@ -1,4 +1,3 @@
-
 import { SeatingChartApp } from "@/components/SeatingChartApp";
 
 const Index = () => {

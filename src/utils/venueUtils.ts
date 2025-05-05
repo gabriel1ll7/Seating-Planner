@@ -1,4 +1,3 @@
-
 // Pastel colors for venue elements
 export const PASTEL_COLORS = [
   "#F2FCE2", // Soft Green

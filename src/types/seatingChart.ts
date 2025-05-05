@@ -1,6 +1,3 @@
-
-import { Canvas, Circle, Rect } from "fabric";
-
 export interface Guest {
   id: string;
   firstName: string;
@@ -10,22 +7,26 @@ export interface Guest {
 }
 
 export interface Table {
+  type: "table";
   id: string;
   number: number;
-  left: number;
-  top: number;
+  x: number;
+  y: number;
   radius: number;
   capacity: number;
-  fabricObject?: Circle;
+  draggable?: boolean;
 }
 
 export interface VenueElement {
+  type: "venue";
   id: string;
   title: string;
-  left: number;
-  top: number;
+  x: number;
+  y: number;
   width: number;
   height: number;
-  color: string;
-  fabricObject?: Rect;
+  color?: string;
+  stroke?: string;
+  strokeWidth?: number;
+  draggable?: boolean;
 }
