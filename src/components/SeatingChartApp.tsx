@@ -46,6 +46,22 @@ export const SeatingChartApp = () => {
     }
   };
 
+  const handleAddTable = () => {
+    addTable();
+    toast({
+      title: "Table Added",
+      description: "A new table has been added to your seating chart.",
+    });
+  };
+
+  const handleAddVenueElement = () => {
+    addVenueElement();
+    toast({
+      title: "Venue Element Added",
+      description: "A new venue element has been added to your seating chart.",
+    });
+  };
+
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <Header totalGuests={totalGuests} onReset={handleReset} />
@@ -53,8 +69,8 @@ export const SeatingChartApp = () => {
         <Sidebar guests={guests} tables={tables} />
         <div className="flex-1 flex flex-col p-4 overflow-hidden">
           <Controls 
-            onAddTable={addTable}
-            onAddVenueElement={addVenueElement}
+            onAddTable={handleAddTable}
+            onAddVenueElement={handleAddVenueElement}
           />
           <Canvas 
             canvas={canvas}
