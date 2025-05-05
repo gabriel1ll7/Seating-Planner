@@ -23,12 +23,20 @@ export const useTables = (
     const canvasWidth = canvas.width || 1000;
     const canvasHeight = canvas.height || 800;
     
+    // Get viewport transform to position in the visible area
+    const vpt = canvas.viewportTransform || [1, 0, 0, 1, 0, 0];
+    const zoom = canvas.getZoom();
+    
+    // Calculate center of the visible viewport
+    const visibleCenterX = (-vpt[4] / zoom) + (canvasWidth / (2 * zoom));
+    const visibleCenterY = (-vpt[5] / zoom) + (canvasHeight / (2 * zoom));
+    
     // Create the new table object - position in the center of the visible area
     const newTable: Table = {
       id: `table-${Date.now()}`,
       number: tableCounter,
-      left: canvasWidth / 2,
-      top: canvasHeight / 2,
+      left: visibleCenterX,
+      top: visibleCenterY,
       radius: 60,
       capacity: 8, // Default capacity
     };

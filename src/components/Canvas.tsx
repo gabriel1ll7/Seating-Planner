@@ -24,6 +24,7 @@ export const Canvas = ({
   const [guestDialogOpen, setGuestDialogOpen] = useState(false);
   const [guestFirstName, setGuestFirstName] = useState("");
   const [guestLastName, setGuestLastName] = useState("");
+  const [isCanvasInitialized, setIsCanvasInitialized] = useState(false);
 
   // Initialize canvas
   useEffect(() => {
@@ -31,6 +32,7 @@ export const Canvas = ({
       console.log("Initializing canvas");
       const fabricCanvas = setupCanvas(canvasRef.current);
       setCanvas(fabricCanvas);
+      setIsCanvasInitialized(true);
     }
   }, [setCanvas, canvas]);
 
@@ -177,14 +179,14 @@ export const Canvas = ({
 
   // Render elements whenever data changes
   useEffect(() => {
-    if (!canvas) return;
+    if (!canvas || !isCanvasInitialized) return;
     
     // Debug information
     console.log('Tables length:', tables.length);
     console.log('Venue elements length:', venueElements.length);
     console.log('Canvas:', canvas);
     
-    // Clear the existing objects
+    // Clear the existing objects (important - prevents duplicate rendering)
     canvas.clear();
     
     // First, draw venue elements (so they're behind tables)
@@ -206,7 +208,10 @@ export const Canvas = ({
       );
     });
     
-  }, [canvas, tables, venueElements, guests]);
+    // Make sure to render all changes
+    canvas.renderAll();
+    
+  }, [canvas, tables, venueElements, guests, isCanvasInitialized]);
 
   return (
     <div className="relative w-full h-full overflow-hidden border border-gray-200 rounded-lg">

@@ -23,12 +23,20 @@ export const useVenueElements = (
       const canvasWidth = canvas.width || 1000;
       const canvasHeight = canvas.height || 800;
       
+      // Get viewport transform to position in the visible area
+      const vpt = canvas.viewportTransform || [1, 0, 0, 1, 0, 0];
+      const zoom = canvas.getZoom();
+      
+      // Calculate center of the visible viewport
+      const visibleCenterX = (-vpt[4] / zoom) + (canvasWidth / (2 * zoom));
+      const visibleCenterY = (-vpt[5] / zoom) + (canvasHeight / (2 * zoom));
+      
       // Create the new venue element
       const newElement: VenueElement = {
         id: `venue-element-${Date.now()}`,
         title: isMainVenue ? "Main Venue" : "New Element",
-        left: isMainVenue ? 100 : canvasWidth / 2 - 150,
-        top: isMainVenue ? 100 : canvasHeight / 2 - 100,
+        left: isMainVenue ? 100 : visibleCenterX - 150,
+        top: isMainVenue ? 100 : visibleCenterY - 100,
         width: isMainVenue ? canvasWidth - 200 : 300,
         height: isMainVenue ? canvasHeight - 200 : 200,
         color: getRandomPastelColor(),
