@@ -169,38 +169,46 @@ export const Canvas = ({
     setGuestLastName("");
   };
 
-  // Render tables whenever tables state changes
+  // Render elements whenever data changes
   useEffect(() => {
-    if (!canvas || tables.length === 0) return;
+    if (!canvas) return;
     
-    canvas.clear(); // Clear the canvas first to avoid duplicates
+    // Debug information
+    console.log('Tables length:', tables.length);
+    console.log('Tables:', tables);
+    console.log('Canvas:', canvas);
     
-    // Create a separate function to avoid setting state in the effect
-    tables.forEach((table) => {
-      if (table.title) {
-        // This is a venue element
-        createVenueElementOnCanvas(
-          canvas, 
-          table, 
-          handleVenueElementUpdate
-        );
-      } else {
-        // This is a table
-        createTableOnCanvas(
-          canvas, 
-          table, 
-          guests,
-          handleTableInteraction
-        );
-      }
+    // Clear the canvas first
+    canvas.clear();
+    
+    // First, draw venue elements (so they're behind tables)
+    const venueElements = tables.filter(el => el.title !== undefined);
+    venueElements.forEach(element => {
+      createVenueElementOnCanvas(
+        canvas, 
+        element, 
+        handleVenueElementUpdate
+      );
     });
     
-    canvas.renderAll(); // Make sure to render after all objects are added
+    // Then draw tables
+    const tableElements = tables.filter(el => el.title === undefined);
+    tableElements.forEach(table => {
+      createTableOnCanvas(
+        canvas, 
+        table, 
+        guests,
+        handleTableInteraction
+      );
+    });
+    
+    // Make sure to render after all objects are added
+    canvas.renderAll();
     
   }, [canvas, tables, guests]);
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
+    <div className="relative w-full h-full overflow-hidden border border-gray-200 rounded-lg">
       <canvas ref={canvasRef} className="fabric-canvas" />
       
       <GuestDialog

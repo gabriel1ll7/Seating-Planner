@@ -13,8 +13,14 @@ export const useTables = (
 ) => {
   // Add a new table to the canvas
   const addTable = useCallback(() => {
-    if (!canvas) return;
+    if (!canvas) {
+      console.error("Cannot add table: Canvas is null");
+      return;
+    }
 
+    console.log("Adding table to canvas", canvas);
+    
+    // Create the new table object
     const newTable: Table = {
       id: `table-${Date.now()}`,
       number: tableCounter,
@@ -24,17 +30,19 @@ export const useTables = (
       capacity: 8, // Default capacity
     };
 
-    // Create table on canvas first
+    // Create table on canvas and get the table with fabric object
     const tableWithFabricObject = createTableOnCanvas(
       canvas,
       newTable,
-      [],
+      [], // Empty guests array for new table
       () => {} // Temporary empty handler
     );
 
-    // Then add to state
-    setTables((prev) => [...prev, tableWithFabricObject]);
-    setTableCounter((prev) => prev + 1);
+    // Update state with the new table
+    setTables(prev => [...prev, tableWithFabricObject]);
+    setTableCounter(prev => prev + 1);
+    
+    console.log("Table added successfully");
   }, [canvas, tableCounter, setTables, setTableCounter]);
 
   return { addTable };

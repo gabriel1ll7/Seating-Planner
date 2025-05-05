@@ -31,7 +31,7 @@ export const SeatingChartApp = () => {
 
   // Save to localStorage whenever state changes
   useEffect(() => {
-    if (canvas) {
+    if (canvas && tables.length > 0) {
       saveToLocalStorage();
     }
   }, [canvas, tables, guests, saveToLocalStorage]);
@@ -47,6 +47,7 @@ export const SeatingChartApp = () => {
   };
 
   const handleAddTable = () => {
+    console.log("Add table button clicked");
     addTable();
     toast({
       title: "Table Added",
@@ -55,6 +56,7 @@ export const SeatingChartApp = () => {
   };
 
   const handleAddVenueElement = () => {
+    console.log("Add venue element button clicked");
     addVenueElement();
     toast({
       title: "Venue Element Added",

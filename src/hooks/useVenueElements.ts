@@ -13,8 +13,14 @@ export const useVenueElements = (
   // Add a venue element (rectangle) to the canvas
   const addVenueElement = useCallback(
     (isMainVenue: boolean = false) => {
-      if (!canvas) return;
+      if (!canvas) {
+        console.error("Cannot add venue element: Canvas is null");
+        return;
+      }
 
+      console.log("Adding venue element to canvas", canvas);
+      
+      // Create the new venue element
       const newElement: VenueElement = {
         id: `venue-element-${Date.now()}`,
         title: isMainVenue ? "Main Venue" : "New Element",
@@ -25,15 +31,17 @@ export const useVenueElements = (
         color: getRandomPastelColor(),
       };
 
-      // Create element on canvas first
+      // Create element on canvas and get the element with fabric object
       const elementWithFabricObject = createVenueElementOnCanvas(
         canvas,
         newElement,
         () => {} // Temporary empty handler
       );
 
-      // Then add to state
-      setVenueElements((prev) => [...prev, elementWithFabricObject]);
+      // Update state with the new venue element
+      setVenueElements(prev => [...prev, elementWithFabricObject]);
+      
+      console.log("Venue element added successfully");
     },
     [canvas, setVenueElements]
   );
