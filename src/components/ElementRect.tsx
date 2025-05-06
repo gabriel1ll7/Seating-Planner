@@ -6,6 +6,29 @@ import { selectedShapeIdAtom, venueSpaceLockedAtom, isPanningAtom, renameModalSt
 import { PrimitiveAtom } from "jotai";
 import { VenueElement } from "../types/seatingChart";
 import { Shape } from "@/lib/atoms";
+import { useTheme } from "@/components/ThemeProvider";
+
+// Direct color values for light mode
+const LIGHT_COLORS = {
+  venueSpaceFill: 'rgba(242, 234, 218, 0.1)', // very light beige, translucent
+  venueSpaceStroke: '#8A6E4B', // dark brown for venue outline
+  elementFill: 'rgba(200, 167, 155, 0.2)', // muted terracotta, translucent
+  elementStroke: '#C8A79B', // muted terracotta
+  elementText: '#3C3226', // rich dark brown
+  selectedStroke: '#8A6E4B', // dark brown for consistency with tables
+  selectedShadow: '#795548', // brown shadow
+};
+
+// Direct color values for dark mode
+const DARK_COLORS = {
+  venueSpaceFill: 'rgba(76, 88, 100, 0.1)', // blue-grey, translucent
+  venueSpaceStroke: '#BE9467', // gold/ochre for venue outline
+  elementFill: 'rgba(100, 110, 120, 0.2)', // blue-grey, translucent
+  elementStroke: '#A3B097', // lighter sage
+  elementText: '#EAE3D4', // soft warm beige
+  selectedStroke: '#BE9467', // gold/ochre for consistency with tables
+  selectedShadow: '#795548', // brown shadow
+};
 
 interface ElementRectProps {
   shapeAtom: PrimitiveAtom<Shape>; // Accept the specific atom for this shape
@@ -21,6 +44,18 @@ const ElementRectContent: React.FC<{ shapeAtom: PrimitiveAtom<VenueElement> }> =
   const trRef = useRef<Konva.Transformer>(null);
   const isSelected = shape.id === selectedShapeId;
   const isVenueSpace = shape.title === "Venue Space";
+  const { theme } = useTheme();
+  
+  // Choose colors based on theme
+  const COLORS = theme === 'dark' ? DARK_COLORS : LIGHT_COLORS;
+
+  // Effect to ensure the element color is correctly set initially and after any theme changes
+  useEffect(() => {
+    // Force redraw to ensure theme colors are properly applied
+    if (shapeRef.current) {
+      shapeRef.current.getLayer()?.batchDraw();
+    }
+  }, [theme]); // Re-run when theme changes
 
   // Draggability depends on type, panning state, and global lock state
   const isDraggable = isVenueSpace ? 
@@ -30,11 +65,6 @@ const ElementRectContent: React.FC<{ shapeAtom: PrimitiveAtom<VenueElement> }> =
   // Calculate resize enabled state for Transformer
   const isResizeEnabled = !isVenueSpace || !isVenueLocked;
 
-  // Add console log for debugging lock state propagation
-  if (isVenueSpace) {
-      console.log(`ElementRect (${shape.id}): isVenueSpace=${isVenueSpace}, isVenueLocked=${isVenueLocked}, calculated_isDraggable=${isDraggable}, calculated_isResizeEnabled=${isResizeEnabled}`);
-  }
-
   useEffect(() => {
     if (isSelected && trRef.current && shapeRef.current) {
       trRef.current.nodes([shapeRef.current]);
@@ -43,6 +73,9 @@ const ElementRectContent: React.FC<{ shapeAtom: PrimitiveAtom<VenueElement> }> =
   }, [isSelected]);
 
   const handleSelect = () => {
+    if (!isVenueLocked && !isVenueSpace) { 
+      return;
+    }
     setSelectedShapeId(shape.id);
   };
 
@@ -80,7 +113,6 @@ const ElementRectContent: React.FC<{ shapeAtom: PrimitiveAtom<VenueElement> }> =
   };
 
   const handleTextDoubleClick = () => {
-    console.log(`Text dbl clicked for ${shape.id}`);
     setRenameModalState({ 
         isOpen: true, 
         elementId: shape.id, 
@@ -91,7 +123,6 @@ const ElementRectContent: React.FC<{ shapeAtom: PrimitiveAtom<VenueElement> }> =
   const handleTextClick = () => {
     // Only open rename modal on single click if already selected
     if (isSelected) {
-      console.log(`Text single clicked for selected element ${shape.id}`); // Debug log
       setRenameModalState({ 
           isOpen: true, 
           elementId: shape.id, 
@@ -99,6 +130,21 @@ const ElementRectContent: React.FC<{ shapeAtom: PrimitiveAtom<VenueElement> }> =
       });
     }
   };
+
+  // Determine the fill and stroke colors based on element type, shape custom colors, and selection state
+  // First check for custom colors, then fall back to theme colors if none specified
+  const fillColor = isVenueSpace ? 
+    COLORS.venueSpaceFill : 
+    (shape.color || COLORS.elementFill);
+    
+  const strokeColor = isVenueSpace ?
+    COLORS.venueSpaceStroke :
+    (isSelected ? COLORS.selectedStroke : (shape.stroke || COLORS.elementStroke));
+    
+  // Enhanced venue outline with proper stroke width
+  const strokeWidth = isVenueSpace ? 
+    2.5 : // Use a value that matches our CSS variable 
+    (isSelected ? 2 : (shape.strokeWidth || 1));
 
   return (
     <React.Fragment>
@@ -118,21 +164,24 @@ const ElementRectContent: React.FC<{ shapeAtom: PrimitiveAtom<VenueElement> }> =
         <Rect
           width={shape.width}
           height={shape.height}
-          fill={shape.color || "rgba(211, 211, 211, 0.1)"} 
-          stroke={shape.stroke || "transparent"} 
-          strokeWidth={shape.strokeWidth || 0} 
-          cornerRadius={4}
+          fill={fillColor}
+          stroke={strokeColor}
+          strokeWidth={strokeWidth}
+          cornerRadius={isVenueSpace ? 8 : 4}
           perfectDrawEnabled={false}
           listening={!isVenueSpace || isSelected}
-          shadowBlur={isSelected ? 10 : 5}
-          shadowOpacity={isSelected ? 0.6 : 0.3}
+          shadowBlur={isSelected ? 12 : 6}
+          shadowColor={COLORS.selectedShadow}
+          shadowOpacity={isSelected ? 0.4 : 0.15}
+          shadowOffset={{ x: 2, y: 2 }}
         />
         {!isVenueSpace && (
           <Text
             text={shape.title}
             fontSize={14}
-            fontFamily="Arial"
-            fill="#333"
+            fontFamily="'Libre Baskerville', serif"
+            fontStyle="bold" // Added bold for better visibility
+            fill={COLORS.elementText}
             align="center"
             verticalAlign="middle"
             width={shape.width}
@@ -142,6 +191,7 @@ const ElementRectContent: React.FC<{ shapeAtom: PrimitiveAtom<VenueElement> }> =
             onClick={handleTextClick}
             onDblClick={handleTextDoubleClick}
             onDblTap={handleTextDoubleClick}
+            padding={5}
           />
         )}
       </Group>
@@ -157,6 +207,10 @@ const ElementRectContent: React.FC<{ shapeAtom: PrimitiveAtom<VenueElement> }> =
               return newBox; 
            }}
            keepRatio={false}
+           borderStroke={COLORS.selectedStroke}
+           anchorFill={isVenueSpace ? COLORS.venueSpaceFill : COLORS.elementFill}
+           anchorStroke={COLORS.selectedStroke}
+           anchorCornerRadius={5}
         />
       )}
     </React.Fragment>

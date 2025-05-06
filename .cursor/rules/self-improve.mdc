@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: true
+alwaysApply: false
 ---
 - **Rule Improvement Triggers:**
   - New code patterns not covered by existing rules

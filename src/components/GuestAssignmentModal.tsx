@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAtom, useSetAtom, useAtomValue } from "jotai";
-import { modalStateAtom, guestsAtom } from "../lib/atoms";
+import { modalStateAtom, guestsAtom } from "@/lib/atoms";
 import { Guest } from "../types/seatingChart";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Trash2 } from "lucide-react";
 
 export const GuestAssignmentModal = () => {
   const [modalState, setModalState] = useAtom(modalStateAtom);
@@ -136,53 +137,84 @@ export const GuestAssignmentModal = () => {
     handleClose();
   };
 
-  // Determine button text based on whether inputs are filled
-  const saveButtonText =
-    firstName.trim() || lastName.trim() ? "Save Guest" : "Remove Guest";
+  // Determine if we're editing a guest (vs. adding a new one)
+  const isEditingExistingGuest = Boolean(modalState.guestId);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleSave();
+    }
+  };
 
   return (
-    <Dialog open={modalState.isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>
-            {modalState.guestId ? "Edit Guest" : "Assign Guest"}
-          </DialogTitle>
-          <DialogDescription>
-            Enter the guest's name for this seat.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="firstName" className="text-right">
-              First Name
-            </Label>
-            <Input
-              id="firstName"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="col-span-3"
-              placeholder="e.g. Jane"
-            />
+    <Dialog open={modalState.isOpen} onOpenChange={handleClose} modal={true}>
+      <DialogContent className="sm:max-w-[425px] bg-card border border-border/60 shadow-md relative overflow-hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        {/* Paper texture overlay */}
+        <div className="absolute inset-0 texture-paper-light texture-paper-dark opacity-60 pointer-events-none"></div>
+        
+        <div className="relative z-10">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-serif text-card-foreground">
+              {modalState.guestId ? "Edit Guest" : "Assign Guest"}
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Enter the guest's name for this seat.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="firstName" className="text-right text-card-foreground font-medium">
+                First Name
+              </Label>
+              <Input
+                id="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="col-span-3 bg-card border-border focus:border-primary focus:ring-primary"
+                placeholder="e.g. Jane"
+                onKeyDown={handleKeyDown}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="lastName" className="text-right text-card-foreground font-medium">
+                Last Name
+              </Label>
+              <Input
+                id="lastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="col-span-3 bg-card border-border focus:border-primary focus:ring-primary"
+                placeholder="e.g. Doe"
+                onKeyDown={handleKeyDown}
+              />
+            </div>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="lastName" className="text-right">
-              Last Name
-            </Label>
-            <Input
-              id="lastName"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="col-span-3"
-              placeholder="e.g. Doe"
-            />
-          </div>
+          <DialogFooter className="gap-2 flex flex-wrap">
+            {isEditingExistingGuest && (
+              <Button 
+                variant="destructive" 
+                onClick={handleRemove}
+                className="bg-destructive/85 hover:bg-destructive text-destructive-foreground transition-colors mr-auto flex gap-1.5 items-center"
+              >
+                <Trash2 size={16} strokeWidth={1.5} />
+                Remove Guest
+              </Button>
+            )}
+            <Button 
+              variant="outline" 
+              onClick={handleClose}
+              className="border-accent bg-accent/10 hover:bg-accent/20 text-accent-foreground transition-colors"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSave}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
+            >
+              Save Guest
+            </Button>
+          </DialogFooter>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave}>{saveButtonText}</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

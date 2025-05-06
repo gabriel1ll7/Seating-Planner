@@ -41,6 +41,15 @@ export const tableCounterAtom = atomWithStorage<number>(
   storage,
 );
 
+// Atom to store the event title
+export const eventTitleAtom = atomWithStorage<string>(
+  "seatingChartEventTitle",
+  "My Event",
+  storage,
+);
+
+// Atom to track the current scale of the Konva stage
+export const stageScaleAtom = atom(1);
 
 // --- Transient Atoms (Not persisted) ---
 
@@ -68,10 +77,16 @@ export const renameModalStateAtom = atom<{
 }>({ isOpen: false, elementId: null, currentTitle: null });
 
 // Atom to track the ID of the guest hovered over in the sidebar
-export const hoveredGuestIdAtom = atom<string | null>(null);
+export const hoveredGuestIdAtom = atomWithReset<string | null>(null);
+
+// Atom to track if a shape is currently being dragged
+export const isDraggingAtom = atom<boolean>(false);
 
 // Atom to track if the stage is currently being panned (RE-ADDING)
 export const isPanningAtom = atom<boolean>(false);
+
+// Atom to track the ID of the table hovered over in the sidebar
+export const hoveredTableIdAtom = atomWithReset<string | null>(null);
 
 // --- Derived Atoms ---
 

@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { Sidebar } from "./Sidebar";
-import { Header } from "./Header";
-import { Controls } from "./Controls";
+import { Header, SaveStatus } from "./Header";
 import { useToast } from "@/components/ui/use-toast";
 import { CanvasStage } from "./CanvasStage";
 import { useAtom, useSetAtom, useAtomValue } from "jotai";
@@ -13,15 +12,19 @@ import {
   shapeAtomsAtom,
   venueSpaceLockedAtom,
   selectedShapeIdAtom,
-  isPanningAtom
+  isPanningAtom,
+  eventTitleAtom
 } from "@/lib/atoms";
 import { Shape } from "@/lib/atoms";
 import { Table, VenueElement } from "../types/seatingChart";
 import { GuestAssignmentModal } from "./GuestAssignmentModal";
 import { RenameElementModal } from "./RenameElementModal";
+import { SortedCanvasStageAdapter } from './SortedCanvasStageAdapter';
 
 export const SeatingChartApp = () => {
   const { toast } = useToast();
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved');
+  const [saveTimerId, setSaveTimerId] = useState<number | null>(null);
 
   const setBaseShapes = useSetAtom(baseShapesAtom);
   const setGuests = useSetAtom(guestsAtom);
@@ -32,11 +35,57 @@ export const SeatingChartApp = () => {
   const [baseShapesValue] = useAtom(baseShapesAtom);
   const [isVenueLocked, setIsVenueLocked] = useAtom(venueSpaceLockedAtom);
   const [selectedShapeIdValue, setSelectedShapeId] = useAtom(selectedShapeIdAtom);
+  const [eventTitle] = useAtom(eventTitleAtom);
 
   const venueSpaceExists = useMemo(() => 
     baseShapesValue.some(shape => shape.type === 'venue' && shape.title === 'Venue Space'),
     [baseShapesValue]
   );
+
+  // Get the array of primitive shape atoms
+  const currentShapeAtoms = useAtomValue(shapeAtomsAtom);
+
+  // Auto-save functionality
+  useEffect(() => {
+    // Set status to unsaved when any data changes (including event title)
+    if (saveStatus === 'saved') {
+      setSaveStatus('unsaved');
+    }
+    
+    // Clear any existing timer
+    if (saveTimerId) {
+      window.clearTimeout(saveTimerId);
+      setSaveTimerId(null);
+    }
+    
+    // Automatically save after 2 seconds of inactivity
+    const timerId = window.setTimeout(() => {
+      autoSave();
+    }, 2000);
+    
+    setSaveTimerId(timerId as unknown as number);
+    
+    return () => {
+      if (saveTimerId) {
+        window.clearTimeout(saveTimerId);
+      }
+    };
+  }, [baseShapesValue, guestsValue, eventTitle]); // Add eventTitle as a dependency
+
+  // Automatic save function - not exposed to UI
+  const autoSave = useCallback(() => {
+    // Only save if not already saved
+    if (saveStatus !== 'saved') {
+      setSaveStatus('saving');
+      
+      // Simulate a slight delay for the saving process
+      // In reality, localStorage is already handled by jotai's atomWithStorage
+      setTimeout(() => {
+        setSaveStatus('saved');
+        // No toast notification for auto-save to reduce UI noise
+      }, 800); // A small delay to show the saving state
+    }
+  }, [saveStatus]);
 
   const handleReset = () => {
     if (
@@ -47,6 +96,7 @@ export const SeatingChartApp = () => {
       setBaseShapes([]);
       setGuests([]);
       setTableCounter(1);
+      setSaveStatus('unsaved'); // Mark as unsaved after reset
       toast({
         title: "Canvas Reset",
         description: "Your seating chart has been cleared.",
@@ -164,24 +214,26 @@ export const SeatingChartApp = () => {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
-      <Header totalGuests={totalGuests} onReset={handleReset} />
+      <Header 
+        totalGuests={totalGuests} 
+        onReset={handleReset}
+        onAddTable={handleAddTable}
+        onAddVenueElement={handleAddVenueElement}
+        onAddVenueSpace={handleAddVenueSpace}
+        isVenueSpacePresent={venueSpaceExists}
+        isVenueSpaceLocked={isVenueLocked}
+        onToggleVenueLock={handleToggleVenueLock}
+        onShowDisabledInfo={showAddVenueSpaceRequiredToast}
+        saveStatus={saveStatus}
+      />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
           guests={guestsValue}
           tables={baseShapesValue.filter((s): s is Table => s.type === "table")}
         />
-        <div className="flex-1 flex flex-col p-4">
-          <Controls
-            onAddTable={handleAddTable}
-            onAddVenueElement={handleAddVenueElement}
-            onAddVenueSpace={handleAddVenueSpace}
-            isVenueSpacePresent={venueSpaceExists}
-            isVenueSpaceLocked={isVenueLocked}
-            onToggleVenueLock={handleToggleVenueLock}
-            onShowDisabledInfo={showAddVenueSpaceRequiredToast}
-          />
-          <div className="flex-1 relative" tabIndex={1}>
-            <CanvasStage shapeAtoms={shapeAtoms} />
+        <div className="flex-1 flex flex-col p-5 border-l border-border/40 bg-background/50">
+          <div className="flex-1 relative rounded-lg border border-border/40 shadow-md overflow-hidden" tabIndex={1}>
+            <SortedCanvasStageAdapter shapeAtoms={currentShapeAtoms} />
           </div>
         </div>
       </div>
