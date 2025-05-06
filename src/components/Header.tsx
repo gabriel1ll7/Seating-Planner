@@ -1,4 +1,4 @@
-import { Moon, Sun, RotateCcw, Users, Square, BookOpen, Lock, Unlock, Save, Check, Armchair, Utensils } from "lucide-react";
+import { Moon, Sun, RotateCcw, Users, Square, BookOpen, Lock, Unlock, Save, Check, Armchair, Utensils, Menu, X } from "lucide-react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/ThemeProvider";
@@ -51,6 +51,8 @@ interface HeaderProps {
   onToggleVenueLock: () => void;
   onShowDisabledInfo: () => void;
   saveStatus: SaveStatus;
+  onToggleMobileSidebar: () => void;
+  isMobileSidebarOpen: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
@@ -63,38 +65,49 @@ export const Header: React.FC<HeaderProps> = ({
   isVenueSpaceLocked,
   onToggleVenueLock,
   onShowDisabledInfo,
-  saveStatus
+  saveStatus,
+  onToggleMobileSidebar,
+  isMobileSidebarOpen
 }) => {
   // Use the persisted atom instead of local state
   const [eventTitle, setEventTitle] = useAtom(eventTitleAtom);
 
   // Update document title when eventTitle changes
   useEffect(() => {
-    document.title = `${eventTitle} - Seating Chart`;
+    document.title = `${eventTitle} - Seating.Art`;
   }, [eventTitle]);
 
   return (
-    <header className="relative bg-gradient-to-r from-card to-card/95 border-b border-border/40 shadow-sm px-7 py-4 overflow-hidden">
+    <header className="relative bg-gradient-to-r from-card to-card/95 border-b border-border/40 shadow-sm px-4 sm:px-7 py-4 overflow-hidden">
       {/* Refined texture overlay */}
       <div className="absolute inset-0 texture-elegant pointer-events-none"></div>
       <div className="relative z-10 flex flex-wrap items-center justify-between">
+        {/* Mobile Sidebar Toggle Button - visible only on small screens */}
+        <div className="lg:hidden mr-2"> {/* Container for the button, shows on <lg screens */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onToggleMobileSidebar}
+            className="border-accent/30 bg-accent/5 hover:bg-accent/15 h-10 w-10 shadow-sm"
+            aria-label="Toggle sidebar"
+          >
+            {isMobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          </Button>
+        </div>
+
         {/* Item 1: Logo and app name */}
-        <div className="flex-shrink-0 mr-4">
-          <h1 className="text-2xl font-medium text-card-foreground flex items-center">
-            <span className="hidden sm:inline-flex items-center justify-center mr-2.5 text-primary/80">
-              {/* Seat/Chair icon */}
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 21V19C19 17.9 18.1 17 17 17H7C5.9 17 5 17.9 5 19V21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M17 8V6C17 4.9 16.1 4 15 4H9C7.9 4 7 4.9 7 6V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M18 8H6C4.9 8 4 8.9 4 10V13C4 14.1 4.9 15 6 15H18C19.1 15 20 14.1 20 13V10C20 8.9 19.1 8 18 8Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </span>
-            <span className="tracking-wide">Seating Chart</span>
+        <div className="flex-shrink-0 mr-3 sm:mr-4 flex items-center">
+          {/* On small screens, only show Seating.Art, on sm+ show icon too */}
+          <span className="hidden sm:inline-flex items-center justify-center mr-2 text-primary/80">
+            <Armchair size={24} strokeWidth={1.5} />
+          </span>
+          <h1 className="text-xl sm:text-2xl font-medium text-card-foreground tracking-wide">
+            Seating.Art
           </h1>
         </div>
         
-        {/* Item 2: Controls (Add Buttons) */}
-        <div className="flex items-center gap-3 mr-2">
+        {/* Item 2: Controls (Add Buttons) - adjust margins if needed due to toggle button */}
+        <div className="flex items-center gap-2 sm:gap-3 order-3 lg:order-2 w-full lg:w-auto mt-3 lg:mt-0 justify-center lg:justify-start lg:mr-auto lg:ml-4">
           <TooltipProvider delayDuration={300}>
             {!isVenueSpacePresent ? (
               <Tooltip>
@@ -106,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({
                     className="border-secondary/40 bg-secondary/5 hover:bg-secondary/15 text-secondary-foreground transition-all font-medium shadow-sm"
                   >
                     <BookOpen className="mr-2" size={16} strokeWidth={1.5} />
-                    Add Venue Space
+                    Draw Event Space
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent className="bg-card text-card-foreground border-border">
@@ -145,7 +158,7 @@ export const Header: React.FC<HeaderProps> = ({
                         className="border-accent/40 bg-accent/5 hover:bg-accent/15 text-accent-foreground transition-all font-medium shadow-sm"
                       >
                         <Armchair className="mr-2" size={16} strokeWidth={1.5} />
-                        Add Venue Element
+                        Add Custom Element
                       </Button>
                     </span>
                   </TooltipTrigger>
@@ -163,9 +176,9 @@ export const Header: React.FC<HeaderProps> = ({
                       className="bg-secondary/80 hover:bg-secondary text-secondary-foreground transition-all font-medium shadow-sm"
                     >
                       {isVenueSpaceLocked ? (
-                        <><Unlock className="mr-2" size={16} strokeWidth={1.5} /> Unlock Venue</>
+                        <><Unlock className="mr-2" size={16} strokeWidth={1.5} /> Unlock Space</>
                       ) : (
-                        <><Lock className="mr-2" size={16} strokeWidth={1.5} /> Lock Venue</>
+                        <><Lock className="mr-2" size={16} strokeWidth={1.5} /> Lock Space</>
                       )}
                     </Button>
                   </TooltipTrigger>
@@ -179,7 +192,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Item 3: Middle section - Event Title */}
-        <div className="flex-grow max-w-[18rem] mr-6 ml-0 hidden sm:block">
+        <div className="flex-grow max-w-[18rem] mr-2 ml-2 hidden md:block lg:order-3">
           <Input
             value={eventTitle}
             onChange={(e) => setEventTitle(e.target.value)}
@@ -189,8 +202,8 @@ export const Header: React.FC<HeaderProps> = ({
           />
         </div>
         
-        {/* Right section - Stats and actions */}
-        <div className="flex items-center space-x-4 flex-shrink-0">
+        {/* Right section - Stats and actions - ensure this section doesn't cause overflow with new button */}
+        <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0 order-2 lg:order-4">
           {/* Save Status Indicator */}
           <TooltipProvider>
             <Tooltip>
@@ -254,8 +267,8 @@ export const Header: React.FC<HeaderProps> = ({
           <ThemeToggle />
         </div>
 
-        {/* Event Title for smaller screens */}
-        <div className="w-full mt-3 sm:hidden">
+        {/* Event Title for smaller screens (md:hidden ensures it does not overlap with the md:block version) */}
+        <div className="w-full mt-3 md:hidden order-5">
           <Input
             value={eventTitle}
             onChange={(e) => setEventTitle(e.target.value)}

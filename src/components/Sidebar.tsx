@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect, useState } from "react";
+import React, { useMemo, useCallback, useEffect, useState, useRef } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { hoveredGuestIdAtom, isDraggingAtom, hoveredTableIdAtom, guestsAtom } from "@/lib/atoms";
 import { Guest, Table } from "../types/seatingChart";
@@ -14,17 +14,23 @@ import {
   DragOverlay, 
   closestCenter,
   type DragStartEvent,
-  type DragEndEvent
+  type DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors
 } from '@dnd-kit/core';
 import { DroppableTableSection } from "./DroppableTableSection";
+import { ScrollIndicator } from "./ScrollIndicator";
 
 interface SidebarProps {
   guests: Guest[];
   tables: Table[];
+  isInSheet?: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ guests, tables }) => {
-  const [hoveredGuestId, setHoveredGuestId] = useAtom(hoveredGuestIdAtom);
+export const Sidebar: React.FC<SidebarProps> = ({ guests, tables, isInSheet }) => {
+  const hoveredGuestId = useAtomValue(hoveredGuestIdAtom);
+  const setHoveredGuestId = useSetAtom(hoveredGuestIdAtom);
   const setHoveredTableId = useSetAtom(hoveredTableIdAtom);
   const isDragging = useAtomValue(isDraggingAtom);
   const setGlobalGuests = useSetAtom(guestsAtom);
@@ -32,6 +38,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ guests, tables }) => {
   const [activeDragData, setActiveDragData] = useState<Guest | null>(null);
   const [flashErrorTableId, setFlashErrorTableId] = useState<string | null>(null);
   const { toast } = useToast();
+  const [showUnassignedInput, setShowUnassignedInput] = useState(false);
+  
+  const scrollAreaContainerRef = useRef<HTMLDivElement>(null);
+  const scrollContentWrapperRef = useRef<HTMLDivElement>(null);
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      delay: 150,
+      tolerance: 5,
+    },
+  });
+
+  const sensors = useSensors(pointerSensor);
   
   const handleGuestMouseEnter = (guestId: string) => {
     if (isDragging) return;
@@ -58,8 +80,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ guests, tables }) => {
   }, [tables]);
 
   const groupedGuests = useMemo(() => {
-    const groups: Record<string, { tableNumber: number | null; tableCapacity?: number; guests: Guest[] }> = {};
-    const unassigned: Guest[] = [];
+    const groups: Record<string, { tableNumber: number | null; tableCapacity?: number; guests: Guest[] }> = {
+      "unassigned": { tableNumber: null, guests: [] }
+    };
+    const unassignedGuestsFromLoop: Guest[] = [];
 
     tables.forEach((table) => {
       groups[table.id] = {
@@ -70,23 +94,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ guests, tables }) => {
     });
 
     guests.forEach((guest) => {
-      if (guest.tableId && tableMap.has(guest.tableId)) {
-        if (!groups[guest.tableId]) {
-          groups[guest.tableId] = {
-            tableNumber: tableMap.get(guest.tableId)?.number ?? null,
-            tableCapacity: tableMap.get(guest.tableId)?.capacity,
+      const guestTableId = guest.tableId || "unassigned";
+
+      if (guestTableId !== "unassigned" && tableMap.has(guestTableId)) {
+        if (!groups[guestTableId]) {
+          groups[guestTableId] = {
+            tableNumber: tableMap.get(guestTableId)?.number ?? null,
+            tableCapacity: tableMap.get(guestTableId)?.capacity,
             guests: [],
           };
         }
-        groups[guest.tableId].guests.push(guest);
+        groups[guestTableId].guests.push(guest);
       } else {
-        unassigned.push(guest);
+        groups["unassigned"].guests.push(guest);
       }
     });
-
-    if (unassigned.length > 0) {
-      groups["unassigned"] = { tableNumber: null, guests: unassigned };
-    }
 
     Object.values(groups).forEach(group => {
       if (group.tableNumber !== null) {
@@ -101,6 +123,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ guests, tables }) => {
     });
 
     const sortedGroupKeys = Object.keys(groups).sort((a, b) => {
+        if (a === "unassigned") return -1;
+        if (b === "unassigned") return 1;
         const numA = groups[a].tableNumber ?? Infinity;
         const numB = groups[b].tableNumber ?? Infinity;
         return numA - numB;
@@ -132,23 +156,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ guests, tables }) => {
   ) => {
     const group = groupedGuests[tableId];
     if (!group) return;
-    const capacity = group.tableCapacity || 0;
+    const capacity = tableId === "unassigned" ? Infinity : (group.tableCapacity || 0);
     const currentTableGuests = group.guests;
 
     if (event.key === 'Enter') {
       event.preventDefault();
       const name = (newGuestNames[tableId] || '').trim();
       if (!name) return;
-      const nextSeatIndex = findNextAvailableSeat(currentTableGuests, capacity);
-      if (nextSeatIndex === null) {
-        console.error("Attempted to add guest to a full table:", tableId);
-        return;
+
+      let nextSeatIndex: number | null = null;
+      if (tableId !== "unassigned") {
+        nextSeatIndex = findNextAvailableSeat(currentTableGuests, capacity);
+        if (nextSeatIndex === null) {
+          console.error("Attempted to add guest to a full table:", tableId);
+          return;
+        }
       }
+
       const newGuest: Guest = {
         id: `guest-${Date.now()}-${Math.random().toString(16).slice(2)}`,
         firstName: name,
         lastName: "",
-        tableId: tableId,
+        tableId: tableId === "unassigned" ? "" : tableId,
         chairIndex: nextSeatIndex,
       };
       setGlobalGuests((prev) => [...prev, newGuest]);
@@ -170,9 +199,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ guests, tables }) => {
       const targetTableId = over.id as string;
       const currentGuest = guests.find(g => g.id === guestId);
       if (!currentGuest) return;
-      if (currentGuest.tableId === targetTableId) return;
+      if (currentGuest.tableId === targetTableId && targetTableId !== "unassigned") return;
+
       if (targetTableId === "unassigned") {
-        setGlobalGuests(prev => prev.map(g => g.id === guestId ? { ...g, tableId: null, chairIndex: null } : g));
+        setGlobalGuests(prev => prev.map(g => g.id === guestId ? { ...g, tableId: "", chairIndex: null } : g));
       } else {
         const targetTable = tables.find(t => t.id === targetTableId);
         if (!targetTable) return;
@@ -203,8 +233,56 @@ export const Sidebar: React.FC<SidebarProps> = ({ guests, tables }) => {
     );
   };
 
+  useEffect(() => {
+    const container = scrollAreaContainerRef.current;
+    const content = scrollContentWrapperRef.current;
+
+    if (!container || !content) {
+      return;
+    }
+
+    const handleScrollOrResize = () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      setIsScrolling(true);
+
+      const isScrollable = content.scrollHeight > container.clientHeight;
+      if (isScrollable) {
+        const isAtBottom = container.scrollTop + container.clientHeight >= content.scrollHeight - 5;
+        setShowScrollIndicator(!isAtBottom);
+      } else {
+        setShowScrollIndicator(false);
+      }
+
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrolling(false);
+      }, 150);
+    };
+
+    handleScrollOrResize();
+
+    container.addEventListener('scroll', handleScrollOrResize);
+
+    const resizeObserver = new ResizeObserver(handleScrollOrResize);
+    resizeObserver.observe(container);
+    resizeObserver.observe(content);
+
+    return () => {
+      container.removeEventListener('scroll', handleScrollOrResize);
+      resizeObserver.disconnect();
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [groupedGuests]);
+
+  const sidebarRootClasses = isInSheet 
+    ? "bg-sidebar flex flex-col h-full overflow-hidden" 
+    : "relative bg-sidebar flex flex-col h-full border-r border-sidebar-border/70 overflow-hidden lg:w-80";
+
   return (
-    <div className="relative w-80 bg-sidebar flex flex-col h-full border-r border-sidebar-border/70 overflow-hidden">
+    <div className={sidebarRootClasses}>
       <div className="absolute inset-0 texture-elegant opacity-90 pointer-events-none"></div>
       <div className="relative z-10 p-5 border-b border-sidebar-border/50 bg-sidebar-accent/5 shadow-sm">
         <div className="flex items-center justify-between">
@@ -228,12 +306,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ guests, tables }) => {
         </div>
       ) : (
         <DndContext 
+          sensors={sensors}
           onDragStart={handleDragStart} 
           onDragEnd={handleDragEnd} 
           collisionDetection={closestCenter}
         >
-          <ScrollArea className="relative flex-1 p-5 z-10">
-            <div className="space-y-4">
+          <ScrollArea ref={scrollAreaContainerRef} className="relative flex-1 p-5 z-10">
+            <div ref={scrollContentWrapperRef} className="space-y-4">
               {Object.entries(groupedGuests).map(([tableId, groupData]) => {
                 const isUnassigned = groupData.tableNumber === null;
                 return (
@@ -252,11 +331,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ guests, tables }) => {
                     onGuestMouseLeave={handleGuestMouseLeave}
                     onGuestRemove={handleRemoveGuest}
                     isFlashingError={tableId === flashErrorTableId}
+                    isInputVisible={isUnassigned ? showUnassignedInput : undefined}
+                    onToggleInput={isUnassigned ? () => setShowUnassignedInput(prev => !prev) : undefined}
                   />
                 );
               })}
             </div>
-            <div className="h-4"></div>
           </ScrollArea>
           
           <DragOverlay>
@@ -271,31 +351,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ guests, tables }) => {
           </DragOverlay>
         </DndContext>
       )}
-
-      <div className="relative z-10 px-4 py-5 mt-auto border-t border-sidebar-border/50 bg-sidebar-accent/5">
-        <div className="bg-sidebar-accent/10 rounded-lg p-4 shadow-sm text-sm text-sidebar-foreground/90 space-y-3 border border-sidebar-border/30">
-          <h3 className="text-sm font-medium text-sidebar-foreground flex items-center">
-            <Info className="mr-1.5 text-sidebar-primary" size={16} strokeWidth={1.5} />
-            Quick Tips
-          </h3>
-          <p className="flex items-center text-xs leading-relaxed">
-            <span className="text-sidebar-primary font-semibold mr-2 text-xs opacity-80">➤</span> 
-            Use <kbd className="px-1.5 py-0.5 rounded bg-sidebar-accent/30 mx-1 text-xs shadow-sm">Alt + Mouse</kbd> to pan
-          </p>
-          <p className="flex items-center text-xs leading-relaxed">
-            <span className="text-sidebar-primary font-semibold mr-2 text-xs opacity-80">➤</span> 
-            <kbd className="px-1.5 py-0.5 rounded bg-sidebar-accent/30 mx-1 text-xs shadow-sm">Scroll</kbd> to zoom in/out
-          </p>
-          <p className="flex items-center text-xs leading-relaxed">
-            <span className="text-sidebar-primary font-semibold mr-2 text-xs opacity-80">➤</span> 
-            <kbd className="px-1.5 py-0.5 rounded bg-sidebar-accent/30 mx-1 text-xs shadow-sm">Delete</kbd> to remove selected elements
-          </p>
-          <p className="flex items-center text-xs leading-relaxed">
-            <span className="text-sidebar-primary font-semibold mr-2 text-xs opacity-80">➤</span> 
-            Double-click text to rename elements
-          </p>
-        </div>
-      </div>
+      <ScrollIndicator isVisible={showScrollIndicator && !isScrolling} />
     </div>
   );
 };
