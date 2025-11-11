@@ -5,6 +5,10 @@
 Plan your perfect seating arrangement with an elegant drag-and-drop interface. From intimate family gatherings to large weddings and corporate events, Seating.Art makes organizing your guests effortless and enjoyable.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![GitHub issues](https://img.shields.io/github/issues/gabriel1ll7/Seating-Planner)](https://github.com/gabriel1ll7/Seating-Planner/issues)
+[![GitHub last commit](https://img.shields.io/github/last-commit/gabriel1ll7/Seating-Planner)](https://github.com/gabriel1ll7/Seating-Planner/commits/main)
+[![Made with React](https://img.shields.io/badge/Made%20with-React-61DAFB?logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 ---
 
