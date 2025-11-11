@@ -363,15 +363,6 @@ SOFTWARE.
 
 ---
 
-## 📧 Contact
-
-**Gabriel Stefan Anghelusa**
-
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Project Link: [https://github.com/yourusername/seating-art](https://github.com/yourusername/seating-art)
-
----
-
 <p align="center">
   Made with ❤️ for event planners everywhere
 </p>
