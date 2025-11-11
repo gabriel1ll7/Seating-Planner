@@ -20,23 +20,9 @@ https://seating.art
 (Add when you have a live deployment URL)
 
 ### Topics (Tags)
-Add these topics to help people discover your project:
+Add these topics to help people discover your project (separated by spaces):
 ```
-seating-chart
-event-planning
-wedding-planner
-seating-arrangement
-react
-typescript
-konva
-event-management
-table-planner
-guest-management
-drag-and-drop
-jotai
-postgresql
-vite
-bun
+seating-chart event-planning wedding-planner seating-arrangement react typescript konva event-management table-planner guest-management drag-and-drop jotai postgresql vite bun
 ```
 
 Click:
