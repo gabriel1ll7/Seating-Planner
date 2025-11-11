@@ -7,32 +7,32 @@
     /* Light Mode - Cozy Elegant Tech Theme */
     --background: 40 30% 97%; /* #FAF7F2 Warm linen */
     --foreground: 30 10% 15%; /* #332E2A Rich dark brown for text */
-    
+
     --card: 40 25% 96%; /* #F7F3EB Soft cream */
     --card-foreground: 30 10% 15%; /* #332E2A Rich dark brown for text */
-    
+
     --popover: 40 25% 96%; /* #F7F3EB Soft cream */
     --popover-foreground: 30 10% 15%; /* #332E2A Rich dark brown */
-    
+
     --primary: 15 28% 57%; /* #B87D6C Muted terracotta */
     --primary-foreground: 0 0% 100%; /* white */
-    
+
     --secondary: 85 15% 48%; /* #7A876E Moss green */
     --secondary-foreground: 0 0% 100%; /* white */
-    
+
     --muted: 35 25% 90%; /* #EAE3D4 Soft warm beige */
     --muted-foreground: 30 8% 35%; /* #645C54 Muted brown-grey */
-    
+
     --accent: 35 40% 62%; /* #C19A6B Soft gold/ochre */
     --accent-foreground: 30 15% 15%; /* #2E2821 Very dark brown */
-    
+
     --destructive: 342 40% 34%; /* #6A3A4F Deep plum */
     --destructive-foreground: 0 0% 100%; /* white */
-    
+
     --border: 35 25% 83%; /* #DACEBC Warm sand */
     --input: 35 25% 83%; /* #DACEBC Warm sand */
     --ring: 15 28% 57%; /* #B87D6C Muted terracotta */
-    
+
     --radius: 0.75rem; /* Slightly more rounded corners */
 
     /* Sidebar specific variables */
@@ -50,21 +50,21 @@
     --table-stroke: 25 30% 42%; /* #8A6E4B darker brown for better contrast */
     --table-text-primary: 25 25% 20%; /* #3C3226 Rich dark brown for text */
     --table-text-secondary: 25 20% 35%; /* #665A4D darker soft brown */
-    
+
     --button-minus-fill: 342 25% 92%; /* #F0E4EA Soft pink */
     --button-minus-stroke: 342 35% 45%; /* #A15E7A Muted plum */
     --button-minus-text: 342 40% 30%; /* #5E3345 Deep plum */
-    
+
     --button-plus-fill: 85 25% 88%; /* #E3EAE0 Soft sage */
     --button-plus-stroke: 85 20% 50%; /* #7E8F75 Sage green */
     --button-plus-text: 85 25% 35%; /* #5A684C Deep moss */
-    
+
     /* Chair states - light mode */
     --chair-assigned-fill: 85 25% 55%; /* #8A9A7D Moss green */
     --chair-assigned-stroke: 85 30% 40%; /* #66755C Darker green border */
     --chair-unassigned-fill: 35 20% 90%; /* #E9E2D7 Warm cream */
     --chair-unassigned-stroke: 25 30% 42%; /* #8A6E4B darker brown */
-    
+
     /* Venue outline */
     --venue-outline-color: 25 30% 42%; /* #8A6E4B darker brown for better visibility */
     --venue-outline-width: 2px;
@@ -74,32 +74,32 @@
     /* Dark Mode - Cozy Elegant Tech Theme */
     --background: 210 10% 15%; /* #232A2E Deep desaturated blue-grey */
     --foreground: 35 25% 90%; /* #EAE3D4 Soft warm beige */
-    
+
     --card: 210 12% 18%; /* #29323A Deeper blue-grey */
     --card-foreground: 35 25% 90%; /* #EAE3D4 Soft warm beige */
-    
+
     --popover: 210 12% 18%; /* #29323A Deeper blue-grey */
     --popover-foreground: 35 25% 90%; /* #EAE3D4 Soft warm beige */
-    
+
     --primary: 15 28% 57%; /* #B87D6C Muted terracotta - keeping consistency */
     --primary-foreground: 35 25% 90%; /* #EAE3D4 Soft warm beige */
-    
+
     --secondary: 85 15% 48%; /* #7A876E Moss green - keeping consistency */
     --secondary-foreground: 35 25% 90%; /* #EAE3D4 Soft warm beige */
-    
+
     --muted: 210 10% 25%; /* #38424A Muted blue-grey */
     --muted-foreground: 35 15% 75%; /* #C9BDAC lighter cream */
-    
+
     --accent: 35 30% 55%; /* #BE9467 Softer gold/ochre */
     --accent-foreground: 35 25% 90%; /* #EAE3D4 Soft warm beige */
-    
+
     --destructive: 342 35% 45%; /* #A15E7A Muted plum */
     --destructive-foreground: 35 25% 90%; /* #EAE3D4 Soft warm beige */
-    
+
     --border: 210 10% 30%; /* #454F58 Deep blue-grey border */
     --input: 210 10% 30%; /* #454F58 Deep blue-grey border */
     --ring: 15 28% 57%; /* #B87D6C Muted terracotta */
-    
+
     /* Sidebar specific variables (dark) */
     --sidebar-background: 210 12% 20%; /* #2D3741 slightly lighter navy-brown */
     --sidebar-foreground: 35 25% 90%; /* #EAE3D4 Soft warm beige */
@@ -115,21 +115,21 @@
     --table-stroke: 35 30% 55%; /* #BE9467 Softer gold/ochre for better contrast */
     --table-text-primary: 35 25% 90%; /* #EAE3D4 Soft warm beige */
     --table-text-secondary: 35 20% 80%; /* #D5C9B7 slightly darker beige */
-    
+
     --button-minus-fill: 342 20% 35%; /* #6F4757 Deep plum background */
     --button-minus-stroke: 342 25% 60%; /* #BB7C96 Lighter plum */
     --button-minus-text: 35 25% 90%; /* #EAE3D4 Soft warm beige */
-    
+
     --button-plus-fill: 85 20% 30%; /* #4D5647 Deep moss */
     --button-plus-stroke: 85 15% 55%; /* #8A9880 Lighter sage */
     --button-plus-text: 35 25% 90%; /* #EAE3D4 Soft warm beige */
-    
+
     /* Chair states - dark mode */
     --chair-assigned-fill: 85 25% 55%; /* #8A9A7D Moss green - keeping consistency */
     --chair-assigned-stroke: 85 25% 65%; /* #A3B097 Lighter green border */
     --chair-unassigned-fill: 210 15% 30%; /* #434D56 Darker blue-grey */
     --chair-unassigned-stroke: 35 30% 55%; /* #BE9467 Softer gold/ochre */
-    
+
     /* Venue outline */
     --venue-outline-color: 35 30% 65%; /* #CBA77D Warm gold for better visibility */
     --venue-outline-width: 2.5px;
@@ -142,24 +142,37 @@
   }
   body {
     @apply bg-background text-foreground;
-    transition: background-color 0.5s ease, color 0.5s ease;
-    font-family: 'Nunito Sans', 'Source Sans Pro', system-ui, sans-serif;
+    transition:
+      background-color 0.5s ease,
+      color 0.5s ease;
+    font-family: "Nunito Sans", "Source Sans Pro", system-ui, sans-serif;
     line-height: 1.6;
   }
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', 'Libre Baskerville', Georgia, serif;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Outfit", "Libre Baskerville", Georgia, serif;
     font-weight: 600;
     line-height: 1.4;
   }
-  p, span, div, button, input, select, textarea {
-    font-family: 'Nunito Sans', 'Source Sans Pro', system-ui, sans-serif;
+  p,
+  span,
+  div,
+  button,
+  input,
+  select,
+  textarea {
+    font-family: "Nunito Sans", "Source Sans Pro", system-ui, sans-serif;
   }
-  
+
   /* Improved button styling */
   button {
     @apply transition-all duration-300 ease-in-out;
   }
-  
+
   /* Elegant focus states */
   :focus-visible {
     @apply ring-2 ring-ring/70 outline-none;
@@ -186,101 +199,117 @@
 
   /* Refined texture for subtle warmth */
   .texture-elegant {
-    background-image: linear-gradient(90deg, 
-      rgba(180, 140, 110, 0.03) 0%, 
-      rgba(170, 130, 100, 0.03) 20%, 
-      rgba(180, 140, 110, 0.03) 40%, 
+    background-image: linear-gradient(
+      90deg,
+      rgba(180, 140, 110, 0.03) 0%,
+      rgba(170, 130, 100, 0.03) 20%,
+      rgba(180, 140, 110, 0.03) 40%,
       rgba(170, 130, 100, 0.03) 60%,
-      rgba(180, 140, 110, 0.03) 80%, 
-      rgba(170, 130, 100, 0.03) 100%);
+      rgba(180, 140, 110, 0.03) 80%,
+      rgba(170, 130, 100, 0.03) 100%
+    );
     background-size: 50px 100%;
   }
 
   .dark .texture-elegant {
-    background-image: linear-gradient(90deg, 
-      rgba(100, 110, 120, 0.05) 0%, 
-      rgba(90, 100, 110, 0.05) 20%, 
-      rgba(100, 110, 120, 0.05) 40%, 
+    background-image: linear-gradient(
+      90deg,
+      rgba(100, 110, 120, 0.05) 0%,
+      rgba(90, 100, 110, 0.05) 20%,
+      rgba(100, 110, 120, 0.05) 40%,
       rgba(90, 100, 110, 0.05) 60%,
-      rgba(100, 110, 120, 0.05) 80%, 
-      rgba(90, 100, 110, 0.05) 100%);
+      rgba(100, 110, 120, 0.05) 80%,
+      rgba(90, 100, 110, 0.05) 100%
+    );
     background-size: 50px 100%;
   }
 
   /* Linen texture - more refined */
   .texture-linen {
-    background-image: 
-      linear-gradient(45deg, rgba(0,0,0,0.02) 25%, transparent 25%),
-      linear-gradient(-45deg, rgba(0,0,0,0.02) 25%, transparent 25%),
-      linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.02) 75%),
-      linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.02) 75%);
+    background-image:
+      linear-gradient(45deg, rgba(0, 0, 0, 0.02) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(0, 0, 0, 0.02) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, rgba(0, 0, 0, 0.02) 75%),
+      linear-gradient(-45deg, transparent 75%, rgba(0, 0, 0, 0.02) 75%);
     background-size: 20px 20px;
-    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    background-position:
+      0 0,
+      0 10px,
+      10px -10px,
+      -10px 0;
   }
 
   /* Subtle gradient */
   .gradient-warm {
-    background-image: linear-gradient(45deg, 
-      hsl(var(--muted)) 0%, 
-      hsl(var(--accent) / 0.1) 100%);
+    background-image: linear-gradient(
+      45deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--accent) / 0.1) 100%
+    );
   }
 
   .dark .gradient-warm {
-    background-image: linear-gradient(45deg, 
-      hsl(var(--muted)) 0%, 
-      hsl(var(--accent) / 0.1) 100%);
+    background-image: linear-gradient(
+      45deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--accent) / 0.1) 100%
+    );
   }
 
   /* Book-like card with softer shadows */
   .card-book {
     border-radius: 0.75rem;
-    box-shadow: 
-      0 3px 6px rgba(0,0,0,0.03),
-      0 5px 10px rgba(0,0,0,0.05),
-      0 0 0 1px rgba(0,0,0,0.02);
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    box-shadow:
+      0 3px 6px rgba(0, 0, 0, 0.03),
+      0 5px 10px rgba(0, 0, 0, 0.05),
+      0 0 0 1px rgba(0, 0, 0, 0.02);
+    transition:
+      transform 0.4s ease,
+      box-shadow 0.4s ease;
   }
 
   .card-book:hover {
     transform: translateY(-2px);
-    box-shadow: 
-      0 5px 10px rgba(0,0,0,0.04),
-      0 10px 20px rgba(0,0,0,0.07),
-      0 0 0 1px rgba(0,0,0,0.02);
+    box-shadow:
+      0 5px 10px rgba(0, 0, 0, 0.04),
+      0 10px 20px rgba(0, 0, 0, 0.07),
+      0 0 0 1px rgba(0, 0, 0, 0.02);
   }
 
   /* Floating element with subtle shadow */
   .element-float {
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    transition:
+      transform 0.4s ease,
+      box-shadow 0.4s ease;
   }
 
   .element-float:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   }
 
   .dark .element-float:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   }
-  
+
   /* Button animations */
   .btn-elegant {
     @apply transition-all duration-300 ease-in-out transform;
   }
-  
+
   .btn-elegant:hover {
     @apply translate-y-[-1px] shadow-md;
   }
-  
+
   .btn-elegant:active {
     @apply translate-y-[0px] shadow-sm scale-[0.98];
   }
-  
+
   /* Soft glow effect for dark mode */
   .dark .glow-subtle {
     box-shadow: 0 0 12px rgba(190, 148, 103, 0.15);
   }
-  
+
   .dark .glow-subtle:hover {
     box-shadow: 0 0 18px rgba(190, 148, 103, 0.25);
   }

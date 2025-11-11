@@ -1,17 +1,19 @@
-import React, { useMemo } from 'react';
-import { atom, useAtomValue, PrimitiveAtom } from 'jotai';
-import { Shape } from '../lib/atoms'; // Corrected import path
-import { CanvasStage } from './CanvasStage';   // Adjust path if needed
+import React, { useMemo } from "react";
+import { atom, useAtomValue, PrimitiveAtom } from "jotai";
+import { Shape } from "../lib/atoms"; // Corrected import path
+import { CanvasStage } from "./CanvasStage"; // Adjust path if needed
 
 interface SortedCanvasStageAdapterProps {
   shapeAtoms: PrimitiveAtom<Shape>[];
 }
 
-export const SortedCanvasStageAdapter: React.FC<SortedCanvasStageAdapterProps> = ({ shapeAtoms }) => {
+export const SortedCanvasStageAdapter: React.FC<
+  SortedCanvasStageAdapterProps
+> = ({ shapeAtoms }) => {
   // Create a memoized derived atom that reads all shape values from the passed atoms.
   const getShapeValuesAtom = useMemo(
-    () => atom(get => shapeAtoms.map(primitiveAtom => get(primitiveAtom))),
-    [shapeAtoms] // Recreate this derived atom only if the shapeAtoms array instance changes
+    () => atom((get) => shapeAtoms.map((primitiveAtom) => get(primitiveAtom))),
+    [shapeAtoms], // Recreate this derived atom only if the shapeAtoms array instance changes
   );
   const shapeValues = useAtomValue(getShapeValuesAtom);
 
@@ -29,7 +31,7 @@ export const SortedCanvasStageAdapter: React.FC<SortedCanvasStageAdapterProps> =
       const typeA = itemA.value.type;
       const typeB = itemB.value.type;
 
-      const orderPriority: Record<Shape['type'], number> = {
+      const orderPriority: Record<Shape["type"], number> = {
         venue: 1, // Rendered first
         table: 2, // Rendered second (on top of venue)
       };
@@ -41,8 +43,8 @@ export const SortedCanvasStageAdapter: React.FC<SortedCanvasStageAdapterProps> =
     });
 
     // Return just the sorted atoms
-    return atomsWithValues.map(item => item.atom);
+    return atomsWithValues.map((item) => item.atom);
   }, [shapeAtoms, shapeValues]); // Re-sort if atoms array or their values change
 
   return <CanvasStage shapeAtoms={sortedAtomsForCanvas} />;
-}; 
+};

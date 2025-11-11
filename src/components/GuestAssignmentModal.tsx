@@ -141,7 +141,7 @@ export const GuestAssignmentModal = () => {
   const isEditingExistingGuest = Boolean(modalState.guestId);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       handleSave();
     }
   };
@@ -151,7 +151,7 @@ export const GuestAssignmentModal = () => {
       <DialogContent className="sm:max-w-[425px] bg-card border border-border/60 shadow-md relative overflow-hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         {/* Paper texture overlay */}
         <div className="absolute inset-0 texture-paper-light texture-paper-dark opacity-60 pointer-events-none"></div>
-        
+
         <div className="relative z-10">
           <DialogHeader>
             <DialogTitle className="text-xl font-serif text-card-foreground">
@@ -163,7 +163,10 @@ export const GuestAssignmentModal = () => {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="firstName" className="text-right text-card-foreground font-medium">
+              <Label
+                htmlFor="firstName"
+                className="text-right text-card-foreground font-medium"
+              >
                 First Name
               </Label>
               <Input
@@ -176,7 +179,10 @@ export const GuestAssignmentModal = () => {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="lastName" className="text-right text-card-foreground font-medium">
+              <Label
+                htmlFor="lastName"
+                className="text-right text-card-foreground font-medium"
+              >
                 Last Name
               </Label>
               <Input
@@ -191,8 +197,8 @@ export const GuestAssignmentModal = () => {
           </div>
           <DialogFooter className="gap-2 flex flex-wrap">
             {isEditingExistingGuest && (
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 onClick={handleRemove}
                 className="bg-destructive/85 hover:bg-destructive text-destructive-foreground transition-colors mr-auto flex gap-1.5 items-center"
               >
@@ -200,14 +206,14 @@ export const GuestAssignmentModal = () => {
                 Remove Guest
               </Button>
             )}
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleClose}
               className="border-accent bg-accent/10 hover:bg-accent/20 text-accent-foreground transition-colors"
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleSave}
               className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
             >

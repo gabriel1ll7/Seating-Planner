@@ -13,16 +13,22 @@ import {
   venueSpaceLockedAtom,
   selectedShapeIdAtom,
   isPanningAtom,
-  eventTitleAtom
+  eventTitleAtom,
+  editModeAtom,
 } from "@/lib/atoms";
 import { Shape } from "@/lib/atoms";
 import { Table, VenueElement } from "../types/seatingChart";
 import { GuestAssignmentModal } from "./GuestAssignmentModal";
 import { RenameElementModal } from "./RenameElementModal";
-import { SortedCanvasStageAdapter } from './SortedCanvasStageAdapter';
+import { SortedCanvasStageAdapter } from "./SortedCanvasStageAdapter";
 import { useVenuePersistence } from "@/hooks/useVenuePersistence";
-import { nanoid } from 'nanoid';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { nanoid } from "nanoid";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 // Placeholder for useMediaQuery hook
 const useMediaQuery = (query: string) => {
@@ -47,6 +53,8 @@ export const SeatingChartApp = () => {
     handleResetVenue,
     serverError,
     updateError,
+    editMode,
+    attemptUnlock,
   } = useVenuePersistence();
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -59,9 +67,9 @@ export const SeatingChartApp = () => {
   }, [isDesktop, isSheetOpen]);
 
   const saveStatus: SaveStatus = useMemo(() => {
-    if (isSaving) return 'saving';
-    if (updateError) return 'unsaved';
-    return 'saved';
+    if (isSaving) return "saving";
+    if (updateError) return "unsaved";
+    return "saved";
   }, [isSaving, updateError]);
 
   const setBaseShapes = useSetAtom(baseShapesAtom);
@@ -72,29 +80,36 @@ export const SeatingChartApp = () => {
   const [shapeAtoms] = useAtom(shapeAtomsAtom);
   const [baseShapesValue] = useAtom(baseShapesAtom);
   const [isVenueLocked, setIsVenueLocked] = useAtom(venueSpaceLockedAtom);
-  const [selectedShapeIdValue, setSelectedShapeId] = useAtom(selectedShapeIdAtom);
+  const [selectedShapeIdValue, setSelectedShapeId] =
+    useAtom(selectedShapeIdAtom);
   const [eventTitle] = useAtom(eventTitleAtom);
 
-  const venueSpaceExists = useMemo(() => 
-    baseShapesValue.some(shape => shape.type === 'venue' && shape.title === 'Venue Space'),
-    [baseShapesValue]
+  const venueSpaceExists = useMemo(
+    () =>
+      baseShapesValue.some(
+        (shape) => shape.type === "venue" && shape.title === "Venue Space",
+      ),
+    [baseShapesValue],
   );
 
   useEffect(() => {
     if (serverError) {
       toast({
         title: "Error Loading Venue",
-        description: serverError.message || "Could not load venue data from server.",
+        description:
+          serverError.message || "Could not load venue data from server.",
         variant: "destructive",
       });
-      }
+    }
   }, [serverError, toast]);
 
   useEffect(() => {
     if (updateError) {
       toast({
         title: "Error Saving Venue",
-        description: (updateError as Error).message || "Could not save venue data to server.",
+        description:
+          (updateError as Error).message ||
+          "Could not save venue data to server.",
         variant: "destructive",
       });
     }
@@ -115,6 +130,14 @@ export const SeatingChartApp = () => {
   }, [handleResetVenue, toast]);
 
   const handleAddTable = () => {
+    if (editMode === false) {
+      toast({
+        title: "View-Only Mode",
+        description: "Cannot add tables while in view-only mode.",
+        variant: "destructive",
+      });
+      return;
+    }
     const currentTableCounter = tableCounterValue;
     const newTable: Table = {
       id: `table-${Date.now()}-${nanoid(4)}`,
@@ -135,6 +158,14 @@ export const SeatingChartApp = () => {
   };
 
   const handleAddVenueElement = () => {
+    if (editMode === false) {
+      toast({
+        title: "View-Only Mode",
+        description: "Cannot add venue elements while in view-only mode.",
+        variant: "destructive",
+      });
+      return;
+    }
     const randomHue = Math.floor(Math.random() * 360);
     const randomSaturation = 30 + Math.floor(Math.random() * 30);
     const randomLightness = 75 + Math.floor(Math.random() * 15);
@@ -160,8 +191,20 @@ export const SeatingChartApp = () => {
   };
 
   const handleAddVenueSpace = () => {
+    if (editMode === false) {
+      toast({
+        title: "View-Only Mode",
+        description: "Cannot add venue space while in view-only mode.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (venueSpaceExists) {
-      toast({ title: "Action Denied", description: "A Venue Space element already exists.", variant: "destructive" });
+      toast({
+        title: "Action Denied",
+        description: "A Venue Space element already exists.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -178,44 +221,60 @@ export const SeatingChartApp = () => {
       stroke: "#333333",
       strokeWidth: 2,
     };
-    
+
     setBaseShapes((prevShapes) => [...prevShapes, newVenueSpace]);
-    
+
     setIsVenueLocked(false);
     setSelectedShapeId(newId);
 
     toast({
       title: "Venue Space Added",
-      description: "The main venue area has been defined and selected. It is currently unlocked.",
+      description:
+        "The main venue area has been defined and selected. It is currently unlocked.",
     });
   };
 
   const handleToggleVenueLock = () => {
+    if (editMode === false) {
+      toast({
+        title: "View-Only Mode",
+        description: "Cannot toggle venue lock while in view-only mode.",
+        variant: "destructive",
+      });
+      return;
+    }
     const nextLockedState = !isVenueLocked;
     setIsVenueLocked(nextLockedState);
-    
-    const venueSpaceElement = baseShapesValue.find(shape => shape.type === 'venue' && shape.title === 'Venue Space');
+
+    const venueSpaceElement = baseShapesValue.find(
+      (shape) => shape.type === "venue" && shape.title === "Venue Space",
+    );
     const venueSpaceId = venueSpaceElement?.id;
 
     if (!nextLockedState && venueSpaceId) {
       setSelectedShapeId(venueSpaceId);
-    } else if (nextLockedState && venueSpaceId && selectedShapeIdValue === venueSpaceId) {
-        setSelectedShapeId(null);
+    } else if (
+      nextLockedState &&
+      venueSpaceId &&
+      selectedShapeIdValue === venueSpaceId
+    ) {
+      setSelectedShapeId(null);
     }
 
     toast({
-        title: `Venue Space ${nextLockedState ? "Locked" : "Unlocked"}`,
-        description: `The Venue Space element is now ${nextLockedState ? "locked and cannot be moved/resized" : "unlocked for editing"}.`,
+      title: `Venue Space ${nextLockedState ? "Locked" : "Unlocked"}`,
+      description: `The Venue Space element is now ${nextLockedState ? "locked and cannot be moved/resized" : "unlocked for editing"}.`,
     });
   };
 
   const showAddVenueSpaceRequiredToast = () => {
-      toast({
-          title: "Action Unavailable",
-          description: "Please add and define the Venue Space first before adding tables or other elements.",
-          variant: "destructive",
-          duration: 3000,
-      });
+    toast({
+      title: "Action Unavailable",
+      description:
+        "Please add and define the Venue Space first before adding tables or other elements.",
+      variant: "destructive",
+      duration: 3000,
+    });
   };
 
   if (isLoading) {
@@ -228,8 +287,8 @@ export const SeatingChartApp = () => {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
-      <Header 
-        totalGuests={totalGuests} 
+      <Header
+        totalGuests={totalGuests}
         onReset={handleReset}
         onAddTable={handleAddTable}
         onAddVenueElement={handleAddVenueElement}
@@ -239,31 +298,42 @@ export const SeatingChartApp = () => {
         onToggleVenueLock={handleToggleVenueLock}
         onShowDisabledInfo={showAddVenueSpaceRequiredToast}
         saveStatus={saveStatus}
-        onToggleMobileSidebar={() => setIsSheetOpen(prev => !prev)}
+        onToggleMobileSidebar={() => setIsSheetOpen((prev) => !prev)}
         isMobileSidebarOpen={isSheetOpen}
+        attemptUnlock={attemptUnlock}
       />
       <div className="flex flex-1 overflow-hidden">
         {isDesktop ? (
           <Sidebar
             guests={guestsValue}
-            tables={baseShapesValue.filter((s): s is Table => s.type === "table")}
+            tables={baseShapesValue.filter(
+              (s): s is Table => s.type === "table",
+            )}
           />
         ) : (
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-            <SheetContent side="left" className="w-72 sm:w-80 p-0 overflow-y-auto">
+            <SheetContent
+              side="left"
+              className="w-72 sm:w-80 p-0 overflow-y-auto"
+            >
               <SheetHeader className="p-5 pb-2 sr-only">
                 <SheetTitle>Guest List and Tables</SheetTitle>
               </SheetHeader>
               <Sidebar
                 guests={guestsValue}
-                tables={baseShapesValue.filter((s): s is Table => s.type === "table")}
+                tables={baseShapesValue.filter(
+                  (s): s is Table => s.type === "table",
+                )}
                 isInSheet={true}
               />
             </SheetContent>
           </Sheet>
         )}
         <div className="flex-1 flex flex-col p-4 md:p-5 border-l border-border/40 bg-background/50">
-          <div className="flex-1 relative rounded-lg border border-border/40 shadow-md overflow-hidden" tabIndex={1}>
+          <div
+            className="flex-1 relative rounded-lg border border-border/40 shadow-md overflow-hidden"
+            tabIndex={1}
+          >
             <SortedCanvasStageAdapter shapeAtoms={shapeAtoms} />
           </div>
         </div>

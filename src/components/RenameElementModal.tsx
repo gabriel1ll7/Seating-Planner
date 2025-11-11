@@ -24,7 +24,7 @@ export const RenameElementModal = () => {
     if (modalState.isOpen && modalState.currentTitle) {
       setNewTitle(modalState.currentTitle);
     } else {
-        setNewTitle(""); // Reset on open without title or on close
+      setNewTitle(""); // Reset on open without title or on close
     }
   }, [modalState.isOpen, modalState.currentTitle]);
 
@@ -36,12 +36,14 @@ export const RenameElementModal = () => {
     if (!modalState.elementId) return;
 
     setBaseShapes((currentShapes) => {
-      const index = currentShapes.findIndex((s) => s.id === modalState.elementId);
+      const index = currentShapes.findIndex(
+        (s) => s.id === modalState.elementId,
+      );
       if (index === -1) return currentShapes;
 
       const shapeToUpdate = currentShapes[index];
       // Ensure it's a VenueElement before updating title
-      if (shapeToUpdate.type !== 'venue') return currentShapes; 
+      if (shapeToUpdate.type !== "venue") return currentShapes;
 
       const updatedShape: VenueElement = {
         ...shapeToUpdate,
@@ -55,7 +57,7 @@ export const RenameElementModal = () => {
 
     handleClose(); // Close modal after saving
   };
-  
+
   // Prevent closing via overlay click if needed, but usually fine
   // const handleOpenChange = (open: boolean) => {
   //   if (!open) {
@@ -82,17 +84,23 @@ export const RenameElementModal = () => {
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               className="col-span-3"
-              onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); }} // Save on Enter
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSave();
+              }} // Save on Enter
             />
           </div>
         </div>
         <DialogFooter>
-           <DialogClose asChild>
-               <Button type="button" variant="outline">Cancel</Button>
-           </DialogClose>
-           <Button type="button" onClick={handleSave}>Save changes</Button>
+          <DialogClose asChild>
+            <Button type="button" variant="outline">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button type="button" onClick={handleSave}>
+            Save changes
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-}; 
+};
