@@ -332,7 +332,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ```
 MIT License
 
-Copyright (c) 2025 Gabriel Stefan Anghelusa
+Copyright (c) 2025
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -357,12 +357,6 @@ SOFTWARE.
 
 ## 🙏 Acknowledgments
 
-- Built with love for my son's baptism celebration
+- Built for my son's baptism celebration
 - Inspired by the need for better event planning tools
 - Thanks to the open-source community for the amazing tools and libraries
-
----
-
-<p align="center">
-  Made with ❤️ for event planners everywhere
-</p>
