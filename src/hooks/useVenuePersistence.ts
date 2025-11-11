@@ -136,20 +136,17 @@ export const useVenuePersistence = () => {
     pinNeedsSync.current = null; // Reset PIN sync status
     setEditMode(false); // Default to view mode on slug change
     setVenuePin(null);
-    console.log(`Persistence Hook: Slug changed/detected: ${slug}`);
 
     if (!slug) {
       // === No Slug: Check localStorage for last used slug ===
       const lastSlug = storage.getLastSlug();
       if (lastSlug) {
-        console.log(
           `Persistence Hook: No slug in URL, found last used slug '${lastSlug}', navigating...`,
         );
         navigate(`/${lastSlug}`, { replace: true });
         // The hook will re-run with the actual slug now, triggering the 'else' block below
       } else {
         // === No Slug & No Last Slug: Generate New Venue ===
-        console.log(
           "Persistence Hook: No slug and no last slug found, generating new one...",
         );
         const newSlug = generateClientSlug();
@@ -181,7 +178,6 @@ export const useVenuePersistence = () => {
       }
     } else {
       // === Slug Exists: Load Flow ===
-      console.log(
         `Persistence Hook: Attempting to load from localStorage for slug: ${slug}`,
       );
       const localData = storage.getVenueData(slug);
@@ -189,7 +185,6 @@ export const useVenuePersistence = () => {
       const localEditMode = storage.getEditModeStorage(slug);
 
       if (localPin && localEditMode) {
-        console.log("Persistence Hook: Found local PIN and edit mode enabled.");
         setVenuePin(localPin);
         setEditMode(true);
       } else {
@@ -199,7 +194,6 @@ export const useVenuePersistence = () => {
 
       if (localData) {
         // 1. Found in localStorage
-        console.log(
           "Persistence Hook: Data found in localStorage, loading into Jotai.",
         );
         setShapes(localData.shapes);
@@ -211,7 +205,6 @@ export const useVenuePersistence = () => {
         loadedSlugRef.current = slug;
       } else {
         // 2. Not in localStorage - useVenueQuery will be enabled and fetch
-        console.log(
           "Persistence Hook: No data in localStorage, waiting for server fetch...",
         );
         // Loading state will be handled based on useVenueQuery's isLoading
@@ -242,7 +235,6 @@ export const useVenuePersistence = () => {
       loadedSlugRef.current !== slug &&
       !pinNeedsSync.current
     ) {
-      console.log(
         "Persistence Hook: Server data received, updating Jotai and localStorage.",
       );
       const fetchedVenueData = serverData.venue_data;
@@ -298,7 +290,6 @@ export const useVenuePersistence = () => {
       editMode: boolean, // Pass editMode state
       pinToPotentiallySave: string | null, // Pass current PIN state
     ) => {
-      console.log(
         `Persistence Hook: Debounced save triggered for slug: ${slugToUpdate}. Syncing to server...`,
       );
 
@@ -307,7 +298,6 @@ export const useVenuePersistence = () => {
       // If in edit mode and a PIN exists, include it in the payload
       if (editMode && pinToPotentiallySave) {
         payload.pin = pinToPotentiallySave;
-        console.log(
           `Persistence Hook: Including current PIN in payload for slug ${slugToUpdate}`,
         );
         // Clear the initial sync flag if this save includes the pin that needed syncing
@@ -315,7 +305,6 @@ export const useVenuePersistence = () => {
             pinNeedsSync.current = null;
         }
       } else {
-         console.log(`Persistence Hook: Not including PIN (EditMode: ${editMode}, PinExists: ${!!pinToPotentiallySave})`);
       }
 
       updateVenueMutate(
@@ -329,13 +318,11 @@ export const useVenuePersistence = () => {
             // TODO: Add user feedback (e.g., toast notification)
           },
           onSuccess: (updatedVenue) => {
-            console.log(
               "Persistence Hook: Successfully synced update to server.",
             );
             if (payload.pin) {
               // If PIN was part of this successful sync
               pinNeedsSync.current = null; // Clear the flag
-              console.log(
                 `Persistence Hook: PIN sync successful for ${slugToUpdate}, flag cleared.`,
               );
             }
@@ -355,7 +342,6 @@ export const useVenuePersistence = () => {
       loadedSlugRef.current === slug &&
       slug
     ) {
-      console.log(
         `Persistence Hook: Jotai state changed for ${slug}, saving to localStorage...`,
       );
       storage.setVenueData(slug, currentVenueData);
@@ -367,7 +353,6 @@ export const useVenuePersistence = () => {
 
   // --- Reset Logic --- (Handler to be called from UI)
   const handleResetVenue = useCallback(() => {
-    console.log("Persistence Hook: Resetting venue...");
     const newSlug = generateClientSlug();
     const newPin = generateVenuePin(); // Generate new PIN
     const initialState: VenueData = {
@@ -412,12 +397,10 @@ export const useVenuePersistence = () => {
         return { success: false, message: "No venue loaded." };
       }
       try {
-        console.log(
           `Persistence Hook: Attempting PIN validation for slug ${slug}`,
         );
         const validationResult = await validatePinOnServer(slug, pinAttempt);
         if (validationResult.success) {
-          console.log(
             `Persistence Hook: PIN validation successful for ${slug}`,
           );
           storage.setPin(slug, pinAttempt); // Store the successfully validated PIN

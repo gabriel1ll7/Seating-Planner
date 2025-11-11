@@ -74,7 +74,6 @@ export const useUpdateVenueMutation = (
   return useMutation({
     mutationFn: ({ slug, data }) => updateVenue(slug, data),
     onSuccess: (data, variables, context) => {
-      console.log(`Invalidating query for venue: ${variables.slug}`);
       queryClient.invalidateQueries({ queryKey: ["venue", variables.slug] });
       options?.onSuccess?.(data, variables, context);
     },
